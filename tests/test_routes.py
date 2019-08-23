@@ -106,7 +106,6 @@ class TestSearchCandidate:
         test_roles,
     ):
         with test_client.session_transaction() as sess:
-            sess["bulk-single"] = "single"
             sess["update-type"] = update_type
         data = {"candidate-email": "test.candidate@numberten.gov.uk"}
         result = test_client.post(
@@ -124,7 +123,6 @@ class TestSearchCandidate:
         self, test_client, logged_in_user
     ):
         with test_client.session_transaction() as sess:
-            sess["bulk-single"] = "single"
             sess["update-type"] = "role"
         data = {"candidate-email": "no-such-candidate@numberten.gov.uk"}
         result = test_client.post(

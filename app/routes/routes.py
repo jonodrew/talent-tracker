@@ -39,7 +39,6 @@ def results():
 @route_blueprint.route("/update", methods=["POST", "GET"])
 def choose_update():
     if request.method == "POST":
-        session["bulk-single"] = request.form.get("bulk-single")
         session["update-type"] = request.form.get("update-type")
         return redirect(url_for("route_blueprint.search_candidate"))
     return render_template("choose-update.html")
