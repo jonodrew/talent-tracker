@@ -13,6 +13,7 @@ from app.models import (
     Promotion,
 )
 from app.routes import route_blueprint
+from sqlalchemy import or_
 
 
 @route_blueprint.route("/")
@@ -52,9 +53,13 @@ def search_candidate():
         "deferral": "route_blueprint.defer_intake",
     }
     if request.method == "POST":
-        candidate = Candidate.query.filter_by(
-            email_address=request.form.get("candidate-email")
-        ).one_or_none()
+        email = request.form.get("candidate-email")
+        candidate = Candidate.query.filter(
+            or_(
+                Candidate.email_address == email,
+                Candidate.secondary_email_address == email,
+            )
+        ).first()
         if candidate:
             session["candidate-id"] = candidate.id
         else:
