@@ -61,6 +61,7 @@ class Candidate(db.Model):
     first_name = db.Column(db.String(128))
     last_name = db.Column(db.String(128))
     email_address = db.Column(db.String(120), unique=True)
+    secondary_email_address = db.Column(db.String(120), unique=True)
 
     # protected characteristics
     caring_responsibility = db.Column(

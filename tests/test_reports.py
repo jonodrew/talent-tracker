@@ -198,7 +198,9 @@ class TestDetailedPromotionReport:
         self, role_change_type, detailed_candidate, intake_year, test_session
     ):
         report = DetailedReport(intake_year, "FLS", role_change_type)
-        if intake_year == 2019 and role_change_type == 1:  # 1 is a substantive promotion
+        if (
+            intake_year == 2019 and role_change_type == 1
+        ):  # 1 is a substantive promotion
             assert report.get_data()[0] == [
                 "Testy Candidate",
                 "test.candidate@numberten.gov.uk",
