@@ -69,6 +69,7 @@ def test_session(db):
 def test_candidate(test_session):
     candidate = Candidate.query.get(1)
     candidate.email_address = 'test.candidate@numberten.gov.uk'
+    candidate.secondary_email_address = "test.secondary@gov.uk"
     candidate.first_name = "Testy"
     candidate.last_name = "Candidate"
     candidate.completed_fast_stream = True

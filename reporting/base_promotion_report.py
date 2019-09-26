@@ -42,7 +42,7 @@ class PromotionReport(Report, ABC):
         return output
 
     def get_row_metadata(self):
-        return NotImplementedError
+        raise NotImplementedError
 
     def row_writer(self, row_header, candidate_list):
         output = [row_header]
