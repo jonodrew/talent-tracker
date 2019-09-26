@@ -256,6 +256,7 @@ def generate_random_fixed_data():
 def generate_known_candidate():
     return Candidate(
         email_address="staging.candidate@gov.uk",
+        secondary_email_address="staging.secondary@gov.uk",
         joining_date=date(2015, 9, 1),
         first_name="Test",
         last_name="Candidate",

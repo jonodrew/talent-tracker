@@ -21,6 +21,7 @@ class DetailedReport(Report):
         self.headers = [
             "candidate name",
             "candidate email",
+            "candidate secondary email",
             "cohort",
             "offer",
             "current role title",
@@ -54,6 +55,7 @@ class DetailedReport(Report):
         return [
             f"{candidate.first_name} {candidate.last_name}",
             candidate.email_address,
+            candidate.secondary_email_address,
             application.cohort,
             application.offer_status(),
             current_role.role_name,

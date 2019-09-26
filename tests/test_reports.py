@@ -204,6 +204,7 @@ class TestDetailedPromotionReport:
             assert report.get_data()[0] == [
                 "Testy Candidate",
                 "test.candidate@numberten.gov.uk",
+                "test.secondary@gov.uk",
                 1,
                 "META",
                 "Director of Happiness",
