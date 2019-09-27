@@ -42,7 +42,7 @@ class TestNewEmail:
 class TestUpdateType:
     @pytest.mark.parametrize("option", ["Role", "Name", "Deferral"])
     def test_get(self, option, test_client, logged_in_user):
-        result = test_client.get(url_for("route_blueprint.choose_update"))
+        result = test_client.get(url_for("update_bp.choose_update"))
         assert option in result.data.decode("UTF-8")
 
 
@@ -139,7 +139,7 @@ class TestSearchCandidate:
         assert result.status_code == 302
         assert (
             result.location
-            == f"http://localhost{url_for('route_blueprint.search_candidate')}"
+            == f"http://localhost{url_for('update_bp.search_candidate')}"
         )
 
 

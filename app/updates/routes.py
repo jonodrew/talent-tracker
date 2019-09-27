@@ -12,21 +12,11 @@ from app.models import (
     Role,
     Promotion,
 )
-from app.routes import route_blueprint
+from app.updates import update_bp
 from sqlalchemy import or_
 
 
-@route_blueprint.route("/")
-def hello_world():
-    return render_template("index.html")
-
-
-@route_blueprint.route("/hello")
-def hello():
-    return "Hello world"
-
-
-@route_blueprint.route("/results")
+@update_bp.route("/results")
 def results():
     candidates = Candidate.query.all()
     return render_template(
@@ -37,20 +27,20 @@ def results():
     )
 
 
-@route_blueprint.route("/update", methods=["POST", "GET"])
+@update_bp.route("/update", methods=["POST", "GET"])
 def choose_update():
     if request.method == "POST":
         session["update-type"] = request.form.get("update-type")
-        return redirect(url_for("route_blueprint.search_candidate"))
+        return redirect(url_for("update_bp.search_candidate"))
     return render_template("choose-update.html")
 
 
-@route_blueprint.route("/update/search-candidate", methods=["POST", "GET"])
+@update_bp.route("/search-candidate", methods=["POST", "GET"])
 def search_candidate():
     next_steps = {
-        "role": "route_blueprint.update_role",
-        "name": "route_blueprint.update_name",
-        "deferral": "route_blueprint.defer_intake",
+        "role": "update_bp.update_role",
+        "name": "update_bp.update_name",
+        "deferral": "update_bp.defer_intake",
     }
     if request.method == "POST":
         email = request.form.get("candidate-email")
@@ -64,25 +54,25 @@ def search_candidate():
             session["candidate-id"] = candidate.id
         else:
             session["error"] = "That email does not exist"
-            return redirect(url_for("route_blueprint.search_candidate"))
+            return redirect(url_for("update_bp.search_candidate"))
         return redirect(url_for(next_steps.get(session.get("update-type"))))
     return render_template("search-candidate.html", error=session.pop("error", None))
 
 
-@route_blueprint.route("/update/role", methods=["POST", "GET"])
+@update_bp.route("/role", methods=["POST", "GET"])
 def update_role():
     candidate_id = session.get("candidate-id")
     if not candidate_id:
-        return redirect(url_for("route_blueprint.search_candidate"))
+        return redirect(url_for("update_bp.search_candidate"))
 
     if request.method == "POST":
-        session["change-route"] = "route_blueprint.update_role"
+        session["change-route"] = "update_bp.update_role"
         form_as_dict: dict = request.form.to_dict(flat=False)
         new_role_title = {"new-title": form_as_dict.pop("new-title")[0]}
         new_role_numbers = {key: int(value[0]) for key, value in form_as_dict.items()}
         new_role = {**new_role_numbers, **new_role_title}
         session["new-role"] = new_role
-        return redirect(url_for("route_blueprint.email_address"))
+        return redirect(url_for("update_bp.email_address"))
 
     data = {
         "promotable_grades": Grade.new_grades(
@@ -101,16 +91,16 @@ def update_role():
     )
 
 
-@route_blueprint.route("/update/name", methods=["POST", "GET"])
+@update_bp.route("/name", methods=["POST", "GET"])
 def update_name():
     candidate_id = session.get("candidate-id")
     if not candidate_id:
-        return redirect(url_for("route_blueprint.search_candidate"))
+        return redirect(url_for("update_bp.search_candidate"))
 
     if request.method == "POST":
-        session["change-route"] = "route_blueprint.update_name"
+        session["change-route"] = "update_bp.update_name"
         session["new-name"] = request.form.to_dict(flat=True)
-        return redirect(url_for("route_blueprint.check_your_answers"))
+        return redirect(url_for("update_bp.check_your_answers"))
 
     return render_template(
         "updates/name.html",
@@ -119,16 +109,16 @@ def update_name():
     )
 
 
-@route_blueprint.route("/update/deferral", methods=["POST", "GET"])
+@update_bp.route("/deferral", methods=["POST", "GET"])
 def defer_intake():
     candidate_id = session.get("candidate-id")
     if not candidate_id:
-        return redirect(url_for("route_blueprint.search_candidate"))
+        return redirect(url_for("update_bp.search_candidate"))
 
     if request.method == "POST":
-        session["change-route"] = "route_blueprint.defer_intake"
+        session["change-route"] = "update_bp.defer_intake"
         session["new-intake-year"] = request.form.get("new-intake-year")
-        return redirect(url_for("route_blueprint.check_your_answers"))
+        return redirect(url_for("update_bp.check_your_answers"))
 
     return render_template(
         "updates/deferral.html",
@@ -137,18 +127,23 @@ def defer_intake():
     )
 
 
-@route_blueprint.route("/update/email-address", methods=["POST", "GET"])
+@update_bp.route("/email-address", methods=["POST", "GET"])
 def email_address():
     if request.method == "POST":
         if request.form.get("update-email-address") == "true":
             session["new-email"] = request.form.get("new-email-address")
 
-        return redirect(url_for("route_blueprint.check_your_answers"))
+        return redirect(url_for("update_bp.check_your_answers"))
 
+    return render_template("updates/new-email-address.html")
+
+
+@update_bp.route("/new-email-address", methods=["POST", "GET"])
+def new_email_address():
     return render_template("updates/email-address.html")
 
 
-@route_blueprint.route("/update/check-your-answers", methods=["POST", "GET"])
+@update_bp.route("/check-your-answers", methods=["POST", "GET"])
 def check_your_answers():
     candidate = Candidate.query.get(session.get("candidate-id"))
     if request.method == "POST":
@@ -184,7 +179,7 @@ def check_your_answers():
         db.session.add(candidate)
         db.session.commit()
 
-        return redirect(url_for("route_blueprint.complete"))
+        return redirect(url_for("update_bp.complete"))
 
     def prettify_string(string_to_prettify):
         string_as_list = list(string_to_prettify)
@@ -227,12 +222,12 @@ def check_your_answers():
     )
 
 
-@route_blueprint.route("/update/complete", methods=["GET"])
+@update_bp.route("/complete", methods=["GET"])
 def complete():
     return render_template("updates/complete.html")
 
 
-@route_blueprint.route("/candidate")
+@update_bp.route("/candidate")
 def candidate():
     return render_template(
         "candidates/profile.html",

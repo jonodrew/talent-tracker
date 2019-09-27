@@ -11,11 +11,11 @@ def create_app(configuration=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-    login_manager.login_view = "route_blueprint.login"
+    login_manager.login_view = "update_bp.login"
 
-    from app.routes import route_blueprint
+    from app.updates import update_bp
 
-    app.register_blueprint(route_blueprint)
+    app.register_blueprint(update_bp, url_prefix="/update/")
 
     from app.auth import auth_blueprint
 
@@ -28,5 +28,9 @@ def create_app(configuration=Config):
     from app.candidates import candidates_bp
 
     app.register_blueprint(candidates_bp, url_prefix="/candidates/")
+
+    from app.main import main_bp
+
+    app.register_blueprint(main_bp)
 
     return app
