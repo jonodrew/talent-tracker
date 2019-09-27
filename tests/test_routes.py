@@ -27,16 +27,25 @@ class TestNewEmail:
         result = test_client.get("/update/email-address")
         assert b"Has the candidate got a new email address?" in result.data
 
-    def test_post(self, test_client, logged_in_user, test_candidate):
+    def test_post_new_address(self, test_client, logged_in_user, test_candidate):
 
         with test_client.session_transaction() as sess:
             sess["candidate-id"] = 1
         data = {
             "update-email-address": "true",
-            "new-email-address": "new-test-email@gov.uk",
         }
-        test_client.post("/update/email-address", data=data)
-        assert "new-test-email@gov.uk" == session.get("new-email")
+        result = test_client.post("/update/email-address", data=data, follow_redirects=True)
+        assert "Which of the candidate's email addresses do you want to change?" in result.data.decode('UTF-8')
+
+    def test_post_no_new_address(self, test_client, logged_in_user):
+        with test_client.session_transaction() as sess:
+            sess["candidate-id"] = 1
+        data = {
+            "update-email-address": "false",
+        }
+        result = test_client.post("/update/email-address", data=data, follow_redirects=False,
+                                  headers={"content-type": "application/x-www-form-urlencoded"},)
+        assert result.location == f"http://localhost{url_for('update_bp.check_your_answers')}"
 
 
 class TestUpdateType:
