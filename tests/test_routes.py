@@ -89,6 +89,10 @@ class TestSearchCandidate:
         assert "Most recent candidate email address" in result.data.decode("UTF-8")
 
     @pytest.mark.parametrize(
+        "email",
+        ("test.candidate@numberten.gov.uk", "test.secondary@gov.uk")
+    )
+    @pytest.mark.parametrize(
         "update_type, expected_title",
         [
             ("role", "Role update"),
@@ -104,10 +108,11 @@ class TestSearchCandidate:
         test_candidate,
         logged_in_user,
         test_roles,
+        email
     ):
         with test_client.session_transaction() as sess:
             sess["update-type"] = update_type
-        data = {"candidate-email": "test.candidate@numberten.gov.uk"}
+        data = {"candidate-email": email}
         result = test_client.post(
             "/update/search-candidate",
             data=data,
