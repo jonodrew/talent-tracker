@@ -52,6 +52,7 @@ def choose_update():
         "role": "update_bp.update_role",
         "name": "update_bp.update_name",
         "deferral": "update_bp.defer_intake",
+        "email": "update_bp.new_email_address"
     }
     if request.method == "POST":
         session["update-type"] = request.form.get("update-type")
