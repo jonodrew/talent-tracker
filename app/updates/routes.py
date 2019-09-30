@@ -27,7 +27,7 @@ def results():
     )
 
 
-@update_bp.route("/update", methods=["POST", "GET"])
+@update_bp.route("/", methods=["POST", "GET"])
 def choose_update():
     if request.method == "POST":
         session["update-type"] = request.form.get("update-type")
