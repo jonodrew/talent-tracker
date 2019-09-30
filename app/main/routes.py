@@ -10,4 +10,3 @@ def hello_world():
 @main_bp.route("/hello")
 def hello():
     return "Hello world"
-

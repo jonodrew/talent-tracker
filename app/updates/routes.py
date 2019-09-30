@@ -28,20 +28,7 @@ def results():
 
 
 @update_bp.route("/", methods=["POST", "GET"])
-def choose_update():
-    if request.method == "POST":
-        session["update-type"] = request.form.get("update-type")
-        return redirect(url_for("update_bp.search_candidate"))
-    return render_template("choose-update.html")
-
-
-@update_bp.route("/search-candidate", methods=["POST", "GET"])
-def search_candidate():
-    next_steps = {
-        "role": "update_bp.update_role",
-        "name": "update_bp.update_name",
-        "deferral": "update_bp.defer_intake",
-    }
+def index():
     if request.method == "POST":
         email = request.form.get("candidate-email")
         candidate = Candidate.query.filter(
@@ -54,16 +41,29 @@ def search_candidate():
             session["candidate-id"] = candidate.id
         else:
             session["error"] = "That email does not exist"
-            return redirect(url_for("update_bp.search_candidate"))
-        return redirect(url_for(next_steps.get(session.get("update-type"))))
+            return redirect(url_for("update_bp.index"))
+        return redirect(url_for("update_bp.choose_update"))
     return render_template("search-candidate.html", error=session.pop("error", None))
+
+
+@update_bp.route("/choose-update", methods=["POST", "GET"])
+def choose_update():
+    next_steps = {
+        "role": "update_bp.update_role",
+        "name": "update_bp.update_name",
+        "deferral": "update_bp.defer_intake",
+    }
+    if request.method == "POST":
+        session["update-type"] = request.form.get("update-type")
+        return redirect(url_for(next_steps.get(session.get("update-type"))))
+    return render_template("choose-update.html")
 
 
 @update_bp.route("/role", methods=["POST", "GET"])
 def update_role():
     candidate_id = session.get("candidate-id")
     if not candidate_id:
-        return redirect(url_for("update_bp.search_candidate"))
+        return redirect(url_for("update_bp.index"))
 
     if request.method == "POST":
         session["change-route"] = "update_bp.update_role"
@@ -95,7 +95,7 @@ def update_role():
 def update_name():
     candidate_id = session.get("candidate-id")
     if not candidate_id:
-        return redirect(url_for("update_bp.search_candidate"))
+        return redirect(url_for("update_bp.index"))
 
     if request.method == "POST":
         session["change-route"] = "update_bp.update_name"
@@ -113,7 +113,7 @@ def update_name():
 def defer_intake():
     candidate_id = session.get("candidate-id")
     if not candidate_id:
-        return redirect(url_for("update_bp.search_candidate"))
+        return redirect(url_for("update_bp.index"))
 
     if request.method == "POST":
         session["change-route"] = "update_bp.defer_intake"

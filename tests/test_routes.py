@@ -24,7 +24,7 @@ def test_home_status_code(test_client, logged_in_user):
 
 class TestNewEmail:
     def test_get(self, test_client, logged_in_user):
-        result = test_client.get("/update/email-address")
+        result = test_client.get(url_for("update_bp.email_address"))
         assert b"Has the candidate got a new email address?" in result.data
 
     def test_post_new_address(self, test_client, logged_in_user, test_candidate):
@@ -34,7 +34,7 @@ class TestNewEmail:
         data = {
             "update-email-address": "true",
         }
-        result = test_client.post("/update/email-address", data=data, follow_redirects=True)
+        result = test_client.post(url_for("update_bp.email_address"), data=data, follow_redirects=True)
         assert "Which of the candidate's email addresses do you want to change?" in result.data.decode('UTF-8')
 
     def test_post_no_new_address(self, test_client, logged_in_user):
@@ -94,53 +94,37 @@ class TestRoleUpdate:
 
 class TestSearchCandidate:
     def test_get(self, test_client, logged_in_user):
-        result = test_client.get("/update/search-candidate")
+        result = test_client.get(url_for("update_bp.index"))
         assert "Most recent candidate email address" in result.data.decode("UTF-8")
 
     @pytest.mark.parametrize(
         "email",
         ("test.candidate@numberten.gov.uk", "test.secondary@gov.uk")
     )
-    @pytest.mark.parametrize(
-        "update_type, expected_title",
-        [
-            ("role", "Role update"),
-            ("name", "Update name"),
-            ("deferral", "Defer intake year"),
-        ],
-    )
     def test_post(
         self,
-        update_type,
-        expected_title,
         test_client,
         test_candidate,
         logged_in_user,
         test_roles,
         email
     ):
-        with test_client.session_transaction() as sess:
-            sess["update-type"] = update_type
         data = {"candidate-email": email}
-        result = test_client.post(
+        test_client.post(
             "/update/search-candidate",
             data=data,
             follow_redirects=True,
             headers={"content-type": "application/x-www-form-urlencoded"},
         )
 
-        assert expected_title in result.data.decode("UTF-8")
-
         assert 1 == session.get("candidate-id")
 
     def test_given_candidate_email_doesnt_exist_when_user_searches_then_user_is_redirected_to_new_search(
         self, test_client, logged_in_user
     ):
-        with test_client.session_transaction() as sess:
-            sess["update-type"] = "role"
         data = {"candidate-email": "no-such-candidate@numberten.gov.uk"}
         result = test_client.post(
-            "/update/search-candidate",
+            url_for("update_bp.index"),
             data=data,
             follow_redirects=False,
             headers={"content-type": "application/x-www-form-urlencoded"},
@@ -148,7 +132,7 @@ class TestSearchCandidate:
         assert result.status_code == 302
         assert (
             result.location
-            == f"http://localhost{url_for('update_bp.search_candidate')}"
+            == f"http://localhost{url_for('update_bp.index')}"
         )
 
 
@@ -194,9 +178,8 @@ class TestAuthentication:
     @pytest.mark.parametrize(
         "url",
         [
-            "/update/search-candidate",
+            "/update/",
             "/reports/",
-            "/update/search-candidate",
             "/candidates/candidate/1",
         ],
     )
