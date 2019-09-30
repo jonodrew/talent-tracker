@@ -131,9 +131,10 @@ def defer_intake():
 def email_address():
     if request.method == "POST":
         if request.form.get("update-email-address") == "true":
-            session["new-email"] = request.form.get("new-email-address")
-
-        return redirect(url_for("update_bp.check_your_answers"))
+            redirect_target = url_for("update_bp.new_email_address")
+        else:
+            redirect_target = url_for("update_bp.check_your_answers")
+        return redirect(redirect_target)
 
     return render_template("updates/new-email-address.html")
 
