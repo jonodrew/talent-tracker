@@ -49,10 +49,25 @@ class TestNewEmail:
 
 
 class TestUpdateType:
-    @pytest.mark.parametrize("option", ["Role", "Name", "Deferral"])
+    @pytest.mark.parametrize("option", ["Role", "Name", "Deferral", "Email"])
     def test_get(self, option, test_client, logged_in_user):
         result = test_client.get(url_for("update_bp.choose_update"))
         assert option in result.data.decode("UTF-8")
+
+    @pytest.mark.parametrize(
+        "option, destination",
+        [
+            ("email", "new_email_address"),
+            ("role", "update_role"),
+            ("name", "update_name"),
+            ("deferral", "defer_intake"),
+        ]
+    )
+    def test_post_returns_correct_destination(self, option, destination, test_client, logged_in_user, test_session):
+        destination_url = url_for(f'update_bp.{destination}')
+        result = test_client.post(url_for("update_bp.choose_update"), data={"update-type": option},
+                                  follow_redirects=False, headers={"content-type": "application/x-www-form-urlencoded"})
+        assert result.location == f"http://localhost{destination_url}"
 
 
 class TestRoleUpdate:

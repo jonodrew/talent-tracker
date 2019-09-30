@@ -55,7 +55,7 @@ def choose_update():
     }
     if request.method == "POST":
         session["update-type"] = request.form.get("update-type")
-        return redirect(url_for(next_steps.get(session.get("update-type"))))
+        return redirect(url_for(next_steps.get(request.form.get("update-type"))))
     return render_template("choose-update.html")
 
 
