@@ -132,7 +132,30 @@ class TestSearchCandidate:
     @pytest.mark.parametrize(
         "email", ("test.candidate@numberten.gov.uk", "test.secondary@gov.uk")
     )
+<<<<<<< HEAD
     def test_post(self, test_client, test_candidate, logged_in_user, test_roles, email):
+=======
+    @pytest.mark.parametrize(
+        "update_type, expected_title",
+        [
+            ("role", "Role update"),
+            ("name", "Update name"),
+            ("deferral", "Defer intake year"),
+        ],
+    )
+    def test_post(
+        self,
+        update_type,
+        expected_title,
+        test_client,
+        test_candidate,
+        logged_in_user,
+        test_roles,
+        email,
+    ):
+        with test_client.session_transaction() as sess:
+            sess["update-type"] = update_type
+>>>>>>> Minor tweaks because my new hooks told me to
         data = {"candidate-email": email}
         test_client.post(
             "/update/",
