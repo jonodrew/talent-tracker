@@ -163,6 +163,7 @@ def update_email():
 
 
 @update_bp.route("/check-your-answers", methods=["POST", "GET"])
+def check_your_answers():
 
     def prettify_string(string_to_prettify):
         string_as_list = list(string_to_prettify)
@@ -192,15 +193,25 @@ def update_email():
     if request.method == "POST":
         post_your_answers()
         return redirect(url_for("update_bp.complete"))
+
+    update_data = session.get('update-data')
+
+    if update_data.get("new-role"):
+        update_data["new-role"] = human_readable_role(update_data.get("new-role"))
+    elif update_data.get("new-name"):
+        update_data["name"] = {
             prettify_string(key): value
-            for key, value in session.get("new-name").items()
+            for key, value in update_data.pop("new-name").items()
         }
-    elif session.get("new-intake-year"):
-        session["data-update"] = {"New intake year": session.get("new-intake-year")}
+    elif update_data.get('deferral'):
+        update_data['deferral'] = {
+            prettify_string(key): value
+            for key, value in update_data.pop("deferral").items()
+        }
     return render_template(
         "updates/check-your-answers.html",
         candidate=candidate,
-        data=session.get("data-update"),
+        data=update_data,
         new_email=session.get("new-email"),
     )
 
@@ -237,6 +248,8 @@ def post_your_answers():
 
     db.session.add(candidate)
     db.session.commit()
+
+
 @update_bp.route("/complete", methods=["GET"])
 def complete():
     return render_template("updates/complete.html")
