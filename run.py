@@ -8,11 +8,19 @@ app = create_app()
 
 @app.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'User': User, 'Role': Role, 'Candidate': Candidate, 'Organisation': Organisation}
+    return {
+        "db": db,
+        "User": User,
+        "Role": Role,
+        "Candidate": Candidate,
+        "Organisation": Organisation,
+    }
 
 
 @app.cli.command()
-@click.option('--new-install', default=False, help='Build the database and seed it with data')
+@click.option(
+    "--new-install", default=False, help="Build the database and seed it with data"
+)
 def seed(new_install):
     """
     If you pass it 'new install' it'll build the database for you. Otherwise it'll just seed it with data
