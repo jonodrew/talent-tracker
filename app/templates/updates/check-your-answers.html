@@ -1,5 +1,4 @@
 {% extends 'layout.html' %}
-
 {% block content %}
     <h2 class="govuk-heading-l">
         Check the details you're updating for {{ candidate.first_name }} {{ candidate.last_name }}
@@ -8,24 +7,13 @@
         <div class="govuk-form-group">
             <dl class="govuk-summary-list">
             {% if data.get('new-email') is not none %}
-
-                <div class="govuk-summary-list__row">
-                    <dt class="govuk-summary-list__key">
-                        Email address
-                    </dt>
-                    <dd class="govuk-summary-list__value">
-                        {{ candidate.email_address }}
-                    </dd>
-                    <dd class="govuk-summary-list__actions">
-                        <a class="govuk-link" href="{{ url_for('update_bp.email_address') }}">
-                            Change<span class="govuk-visually-hidden"> email</span>
-                        </a>
-                    </dd>
-                </div>
+                {% include 'partials/check-email.html' %}
              {% endif %}
-                {% for key, value in data.items() %}
+             {% for data_key, data_value in data.items() %}
+                {% for key, value in data_value.items() %}
                     {% include 'partials/summary-section.html' %}
                 {% endfor %}
+            {% endfor %}
             </dl>
         </div>
         <div class="input submit">
