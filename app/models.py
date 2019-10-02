@@ -150,6 +150,26 @@ class Candidate(db.Model):
     def roles_since_date(self, since_date: datetime.date):
         return [role for role in self.roles if role.date_started >= since_date]
 
+    def update_email(self, new_address: str, primary: bool):
+        if primary:
+            self.email_address = new_address
+        elif not primary:
+            self.secondary_email_address = new_address
+
+    def new_role(self, start_date: datetime.date, new_org_id, new_profession_id, new_location_id, new_grade_id, new_title,
+                 role_change_id):
+        self.roles.append(
+            Role(
+                date_started=start_date,
+                organisation_id=new_org_id,
+                profession_id=new_profession_id,
+                location_id=new_location_id,
+                grade_id=new_grade_id,
+                role_name=new_title,
+                role_change_id=role_change_id,
+            )
+        )
+
 
 class Organisation(db.Model):
     id = db.Column(db.Integer, primary_key=True)

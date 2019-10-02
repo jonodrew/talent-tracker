@@ -159,32 +159,9 @@ def update_email():
     candidate = Candidate.query.get(session.get('candidate-id'))
     current_email = candidate.email_address if session.get('which-email') == 'primary-email' else candidate.secondary_email_address
     return render_template("updates/update-email-address.html", candidate=candidate, current_email=current_email)
-                        role_data["start-date-month"],
-                        role_data["start-date-day"],
-                    ),
-                    organisation_id=role_data["new-org"],
-                    profession_id=role_data["new-profession"],
-                    location_id=role_data["new-location"],
-                    grade_id=role_data["new-grade"],
-                    role_name=role_data["new-title"],
-                    role_change_id=role_data["role-change"],
-                )
-            )
-            new_email = session.get("new-email")
-            if new_email:
-                candidate.email_address = new_email
-        elif session.get("new-name"):
-            name_data = session.pop("new-name")
-            candidate.first_name = name_data.get("first-name")
-            candidate.last_name = name_data.get("last-name")
-        elif session.get("new-intake-year"):
-            new_scheme_start_date = date(int(session.pop("new-intake-year")), 3, 1)
-            candidate.applications[0].defer(new_scheme_start_date)
 
-        db.session.add(candidate)
-        db.session.commit()
 
-        return redirect(url_for("update_bp.complete"))
+@update_bp.route("/check-your-answers", methods=["POST", "GET"])
 
     def prettify_string(string_to_prettify):
         string_as_list = list(string_to_prettify)
@@ -210,10 +187,10 @@ def update_email():
 
         return data
 
-    if session.get("new-role"):
-        session["data-update"] = human_readable_role(session["new-role"])
-    elif session.get("new-name"):
-        session["data-update"] = {
+    candidate = Candidate.query.get(session.get("candidate-id"))
+    if request.method == "POST":
+        post_your_answers()
+        return redirect(url_for("update_bp.complete"))
             prettify_string(key): value
             for key, value in session.get("new-name").items()
         }
@@ -227,6 +204,38 @@ def update_email():
     )
 
 
+def post_your_answers():
+    candidate: Candidate = Candidate.query.get(session.get("candidate-id"))
+    update_data = session.get("update-data")
+
+    def new_email_address():
+        email_data = update_data.get("new-email")
+        primary = True if email_data.get("which-email") == "primary-email" else False
+        candidate.update_email(email_data.get("new-address"), primary)
+
+    if update_data.get("new-role"):
+        role_data = update_data.get("new-role")
+        candidate.new_role(
+            start_date=date(role_data["start-date-year"], role_data["start-date-month"], role_data["start-date-day"],),
+            new_org_id=role_data["new-org"], new_profession_id=role_data["new-profession"],
+            new_location_id=role_data["new-location"], new_grade_id=role_data["new-grade"],
+            new_title=role_data["new-title"], role_change_id=role_data["role-change"],
+        )
+    elif update_data.get("new-name"):
+        name_data = update_data.get("new-name")
+        candidate.first_name = name_data.get("first-name")
+        candidate.last_name = name_data.get("last-name")
+    elif update_data.get("new-intake-year"):
+        new_scheme_start_date = date(int(session.pop("new-intake-year")), 3, 1)
+        candidate.applications[0].defer(new_scheme_start_date)
+    elif update_data.get('deferral'):
+        candidate.applications.first().defer(date(int(update_data['deferral'].get('new-intake-year')), 3, 1))
+
+    if update_data.get("new-email"):
+        new_email_address()
+
+    db.session.add(candidate)
+    db.session.commit()
 @update_bp.route("/complete", methods=["GET"])
 def complete():
     return render_template("updates/complete.html")
