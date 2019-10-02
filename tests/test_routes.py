@@ -166,7 +166,8 @@ def test_check_details(
     new_location = Location.query.first()
     role_change = Promotion.query.first()
     with test_client.session_transaction() as sess:
-        sess["new-role"] = {
+        sess["update-data"] = {}
+        sess["update-data"]["new-role"] = {
             "new-grade": higher_grade.id,
             "start-date-day": 1,
             "start-date-month": 1,
@@ -177,13 +178,17 @@ def test_check_details(
             "new-location": new_location.id,
             "new-title": "Senior dev",
         }
-        sess["data-update"] = dict()
+        sess["update-data"]["new-email"] = {
+            "new-address": "changed_address@gov.uk",
+            "which-email": "primary-email"
+        }
         sess["candidate-id"] = test_candidate.id
     test_client.post("/update/check-your-answers")
     latest_role: Role = test_candidate.roles.order_by(Role.id.desc()).first()
     assert "Organisation 1" == Organisation.query.get(latest_role.organisation_id).name
     assert "Senior dev" == latest_role.role_name
     assert "substantive promotion" == latest_role.role_change.value
+    assert "changed_address@gov.uk" == test_candidate.email_address
 
 
 class TestAuthentication:
