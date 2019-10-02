@@ -23,7 +23,7 @@ def test_home_status_code(test_client, logged_in_user):
 
 
 class TestNewEmail:
-    def test_get(self, test_client, logged_in_user):
+    def test_get(self, test_client, logged_in_user, candidate_in_session):
         result = test_client.get(url_for("update_bp.email_address"))
         assert b"Has the candidate got a new email address?" in result.data
 
@@ -58,7 +58,7 @@ class TestNewEmail:
 
 class TestUpdateType:
     @pytest.mark.parametrize("option", ["Role", "Name", "Deferral", "Email"])
-    def test_get(self, option, test_client, logged_in_user):
+    def test_get(self, option, test_client, logged_in_user, candidate_in_session):
         result = test_client.get(url_for("update_bp.choose_update"))
         assert option in result.data.decode("UTF-8")
 
@@ -72,7 +72,13 @@ class TestUpdateType:
         ],
     )
     def test_post_returns_correct_destination(
-        self, option, destination, test_client, logged_in_user, test_session
+        self,
+        option,
+        destination,
+        test_client,
+        logged_in_user,
+        test_session,
+        candidate_in_session,
     ):
         destination_url = url_for(f"update_bp.{destination}")
         result = test_client.post(
@@ -125,14 +131,22 @@ class TestRoleUpdate:
 
 
 class TestSearchCandidate:
-    def test_get(self, test_client, logged_in_user):
+    def test_get(self, test_client, logged_in_user, candidate_in_session):
         result = test_client.get(url_for("update_bp.index"))
         assert "Most recent candidate email address" in result.data.decode("UTF-8")
 
     @pytest.mark.parametrize(
         "email", ("test.candidate@numberten.gov.uk", "test.secondary@gov.uk")
     )
-    def test_post(self, test_client, test_candidate, logged_in_user, test_roles, email):
+    def test_post(
+        self,
+        candidate_in_session,
+        test_client,
+        test_candidate,
+        logged_in_user,
+        test_roles,
+        email,
+    ):
         data = {"candidate-email": email}
         test_client.post(
             "/update/",
@@ -144,7 +158,7 @@ class TestSearchCandidate:
         assert 1 == session.get("candidate-id")
 
     def test_given_candidate_email_doesnt_exist_when_user_searches_then_user_is_redirected_to_new_search(
-        self, test_client, logged_in_user
+        self, test_client, logged_in_user, candidate_in_session
     ):
         data = {"candidate-email": "no-such-candidate@numberten.gov.uk"}
         result = test_client.post(
