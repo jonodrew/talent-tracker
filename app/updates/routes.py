@@ -136,26 +136,29 @@ def email_address():
         else:
             redirect_target = url_for("update_bp.check_your_answers")
         return redirect(redirect_target)
-
     return render_template("updates/new-email-address.html")
 
 
 @update_bp.route("/new-email-address", methods=["POST", "GET"])
 def new_email_address():
+    if request.method == "POST":
+        update_data = session["update-data"]
+        update_data["new-email"] = {"which-email": request.form.get("which-email-address")}
+        session["update-data"] = update_data
+        return redirect(url_for("update_bp.update_email"))
     return render_template("updates/email-address.html")
 
 
-@update_bp.route("/check-your-answers", methods=["POST", "GET"])
-def check_your_answers():
-    candidate = Candidate.query.get(session.get("candidate-id"))
+@update_bp.route("/update-email-address", methods=["POST", "GET"])
+def update_email():
     if request.method == "POST":
-        session.pop("data-update")
-        if session.get("new-role"):
-            role_data = session.pop("new-role", None)
-            candidate.roles.append(
-                Role(
-                    date_started=date(
-                        role_data["start-date-year"],
+        update_data = session["update-data"]
+        update_data["new-email"]["new-address"] = request.form.get("email-address")
+        session["update-data"] = update_data
+        return redirect(url_for("update_bp.check_your_answers"))
+    candidate = Candidate.query.get(session.get('candidate-id'))
+    current_email = candidate.email_address if session.get('which-email') == 'primary-email' else candidate.secondary_email_address
+    return render_template("updates/update-email-address.html", candidate=candidate, current_email=current_email)
                         role_data["start-date-month"],
                         role_data["start-date-day"],
                     ),

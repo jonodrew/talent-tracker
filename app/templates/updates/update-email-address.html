@@ -1,0 +1,15 @@
+{% extends 'updates/update-layout.html' %}
+    {% block form_content %}
+        <div class="govuk-form-group">
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="email-address">
+                    Updated email address
+                </label>
+                <span id="email-address-hint" class="govuk-hint">
+                    This will replace the candidate's "{{ current_email }}" address
+                </span>
+                <input class="govuk-input" id="email-address" name="email-address" type="text">
+            </div>
+        </div>
+        {% endblock %}
+
