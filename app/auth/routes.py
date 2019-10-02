@@ -1,7 +1,7 @@
 from flask import render_template, request, url_for, redirect
 from app.models import User
 from flask_login import login_user, logout_user
-from flask import flash
+from flask import flash, session
 from app.auth import auth_blueprint
 
 
@@ -24,4 +24,5 @@ def login():
 @auth_blueprint.route("/logout")
 def logout():
     logout_user()
+    session.clear()
     return redirect(url_for("auth_bp.login"))
