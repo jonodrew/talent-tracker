@@ -31,21 +31,29 @@ class TestNewEmail:
 
         with test_client.session_transaction() as sess:
             sess["candidate-id"] = 1
-        data = {
-            "update-email-address": "true",
-        }
-        result = test_client.post(url_for("update_bp.email_address"), data=data, follow_redirects=True)
-        assert "Which of the candidate's email addresses do you want to change?" in result.data.decode('UTF-8')
+        data = {"update-email-address": "true"}
+        result = test_client.post(
+            url_for("update_bp.email_address"), data=data, follow_redirects=True
+        )
+        assert (
+            "Which of the candidate's email addresses do you want to change?"
+            in result.data.decode("UTF-8")
+        )
 
     def test_post_no_new_address(self, test_client, logged_in_user):
         with test_client.session_transaction() as sess:
             sess["candidate-id"] = 1
-        data = {
-            "update-email-address": "false",
-        }
-        result = test_client.post("/update/email-address", data=data, follow_redirects=False,
-                                  headers={"content-type": "application/x-www-form-urlencoded"},)
-        assert result.location == f"http://localhost{url_for('update_bp.check_your_answers')}"
+        data = {"update-email-address": "false"}
+        result = test_client.post(
+            "/update/email-address",
+            data=data,
+            follow_redirects=False,
+            headers={"content-type": "application/x-www-form-urlencoded"},
+        )
+        assert (
+            result.location
+            == f"http://localhost{url_for('update_bp.check_your_answers')}"
+        )
 
 
 class TestUpdateType:
@@ -61,12 +69,18 @@ class TestUpdateType:
             ("role", "update_role"),
             ("name", "update_name"),
             ("deferral", "defer_intake"),
-        ]
+        ],
     )
-    def test_post_returns_correct_destination(self, option, destination, test_client, logged_in_user, test_session):
-        destination_url = url_for(f'update_bp.{destination}')
-        result = test_client.post(url_for("update_bp.choose_update"), data={"update-type": option},
-                                  follow_redirects=False, headers={"content-type": "application/x-www-form-urlencoded"})
+    def test_post_returns_correct_destination(
+        self, option, destination, test_client, logged_in_user, test_session
+    ):
+        destination_url = url_for(f"update_bp.{destination}")
+        result = test_client.post(
+            url_for("update_bp.choose_update"),
+            data={"update-type": option},
+            follow_redirects=False,
+            headers={"content-type": "application/x-www-form-urlencoded"},
+        )
         assert result.location == f"http://localhost{destination_url}"
 
 
@@ -116,17 +130,9 @@ class TestSearchCandidate:
         assert "Most recent candidate email address" in result.data.decode("UTF-8")
 
     @pytest.mark.parametrize(
-        "email",
-        ("test.candidate@numberten.gov.uk", "test.secondary@gov.uk")
+        "email", ("test.candidate@numberten.gov.uk", "test.secondary@gov.uk")
     )
-    def test_post(
-        self,
-        test_client,
-        test_candidate,
-        logged_in_user,
-        test_roles,
-        email
-    ):
+    def test_post(self, test_client, test_candidate, logged_in_user, test_roles, email):
         data = {"candidate-email": email}
         test_client.post(
             "/update/",
@@ -148,10 +154,7 @@ class TestSearchCandidate:
             headers={"content-type": "application/x-www-form-urlencoded"},
         )
         assert result.status_code == 302
-        assert (
-            result.location
-            == f"http://localhost{url_for('update_bp.index')}"
-        )
+        assert result.location == f"http://localhost{url_for('update_bp.index')}"
 
 
 def test_check_details(
@@ -183,7 +186,7 @@ def test_check_details(
         }
         sess["update-data"]["new-email"] = {
             "new-address": "changed_address@gov.uk",
-            "which-email": "primary-email"
+            "which-email": "primary-email",
         }
         sess["candidate-id"] = test_candidate.id
     test_client.post("/update/check-your-answers")
@@ -199,12 +202,7 @@ class TestAuthentication:
         assert current_user.is_authenticated
 
     @pytest.mark.parametrize(
-        "url",
-        [
-            "/update/",
-            "/reports/",
-            "/candidates/candidate/1",
-        ],
+        "url", ["/update/", "/reports/", "/candidates/candidate/1"]
     )
     def test_non_logged_in_users_are_redirected_to_login(self, url, test_client):
         with test_client:

@@ -156,8 +156,16 @@ class Candidate(db.Model):
         elif not primary:
             self.secondary_email_address = new_address
 
-    def new_role(self, start_date: datetime.date, new_org_id, new_profession_id, new_location_id, new_grade_id, new_title,
-                 role_change_id):
+    def new_role(
+        self,
+        start_date: datetime.date,
+        new_org_id,
+        new_profession_id,
+        new_location_id,
+        new_grade_id,
+        new_title,
+        role_change_id,
+    ):
         self.roles.append(
             Role(
                 date_started=start_date,

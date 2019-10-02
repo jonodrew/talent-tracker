@@ -53,7 +53,7 @@ def choose_update():
         "role": "update_bp.update_role",
         "name": "update_bp.update_name",
         "deferral": "update_bp.defer_intake",
-        "email": "update_bp.new_email_address"
+        "email": "update_bp.new_email_address",
     }
     if request.method == "POST":
         session["update-type"] = request.form.get("update-type")
@@ -119,7 +119,9 @@ def defer_intake():
 
     if request.method == "POST":
         session["change-route"] = "update_bp.defer_intake"
-        session["update-data"]["deferral"] = {"new-intake-year": request.form.get("new-intake-year")}
+        session["update-data"]["deferral"] = {
+            "new-intake-year": request.form.get("new-intake-year")
+        }
         return redirect(url_for("update_bp.check_your_answers"))
 
     return render_template(
@@ -144,7 +146,9 @@ def email_address():
 def new_email_address():
     if request.method == "POST":
         update_data = session["update-data"]
-        update_data["new-email"] = {"which-email": request.form.get("which-email-address")}
+        update_data["new-email"] = {
+            "which-email": request.form.get("which-email-address")
+        }
         session["update-data"] = update_data
         return redirect(url_for("update_bp.update_email"))
     return render_template("updates/email-address.html")
@@ -157,14 +161,21 @@ def update_email():
         update_data["new-email"]["new-address"] = request.form.get("email-address")
         session["update-data"] = update_data
         return redirect(url_for("update_bp.check_your_answers"))
-    candidate = Candidate.query.get(session.get('candidate-id'))
-    current_email = candidate.email_address if session.get('which-email') == 'primary-email' else candidate.secondary_email_address
-    return render_template("updates/update-email-address.html", candidate=candidate, current_email=current_email)
+    candidate = Candidate.query.get(session.get("candidate-id"))
+    current_email = (
+        candidate.email_address
+        if session.get("which-email") == "primary-email"
+        else candidate.secondary_email_address
+    )
+    return render_template(
+        "updates/update-email-address.html",
+        candidate=candidate,
+        current_email=current_email,
+    )
 
 
 @update_bp.route("/check-your-answers", methods=["POST", "GET"])
 def check_your_answers():
-
     def prettify_string(string_to_prettify):
         string_as_list = list(string_to_prettify)
         string_as_list[0] = string_as_list[0].upper()
@@ -194,7 +205,7 @@ def check_your_answers():
         post_your_answers()
         return redirect(url_for("update_bp.complete"))
 
-    update_data = session.get('update-data')
+    update_data = session.get("update-data")
 
     if update_data.get("new-role"):
         update_data["new-role"] = human_readable_role(update_data.get("new-role"))
@@ -203,8 +214,8 @@ def check_your_answers():
             prettify_string(key): value
             for key, value in update_data.pop("new-name").items()
         }
-    elif update_data.get('deferral'):
-        update_data['deferral'] = {
+    elif update_data.get("deferral"):
+        update_data["deferral"] = {
             prettify_string(key): value
             for key, value in update_data.pop("deferral").items()
         }
@@ -228,10 +239,17 @@ def post_your_answers():
     if update_data.get("new-role"):
         role_data = update_data.get("new-role")
         candidate.new_role(
-            start_date=date(role_data["start-date-year"], role_data["start-date-month"], role_data["start-date-day"],),
-            new_org_id=role_data["new-org"], new_profession_id=role_data["new-profession"],
-            new_location_id=role_data["new-location"], new_grade_id=role_data["new-grade"],
-            new_title=role_data["new-title"], role_change_id=role_data["role-change"],
+            start_date=date(
+                role_data["start-date-year"],
+                role_data["start-date-month"],
+                role_data["start-date-day"],
+            ),
+            new_org_id=role_data["new-org"],
+            new_profession_id=role_data["new-profession"],
+            new_location_id=role_data["new-location"],
+            new_grade_id=role_data["new-grade"],
+            new_title=role_data["new-title"],
+            role_change_id=role_data["role-change"],
         )
     elif update_data.get("new-name"):
         name_data = update_data.get("new-name")
@@ -240,8 +258,10 @@ def post_your_answers():
     elif update_data.get("new-intake-year"):
         new_scheme_start_date = date(int(session.pop("new-intake-year")), 3, 1)
         candidate.applications[0].defer(new_scheme_start_date)
-    elif update_data.get('deferral'):
-        candidate.applications.first().defer(date(int(update_data['deferral'].get('new-intake-year')), 3, 1))
+    elif update_data.get("deferral"):
+        candidate.applications.first().defer(
+            date(int(update_data["deferral"].get("new-intake-year")), 3, 1)
+        )
 
     if update_data.get("new-email"):
         new_email_address()
