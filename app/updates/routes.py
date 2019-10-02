@@ -43,6 +43,7 @@ def index():
             session["error"] = "That email does not exist"
             return redirect(url_for("update_bp.index"))
         return redirect(url_for("update_bp.choose_update"))
+    session["update-data"] = {}
     return render_template("search-candidate.html", error=session.pop("error", None))
 
 
@@ -72,7 +73,7 @@ def update_role():
         new_role_title = {"new-title": form_as_dict.pop("new-title")[0]}
         new_role_numbers = {key: int(value[0]) for key, value in form_as_dict.items()}
         new_role = {**new_role_numbers, **new_role_title}
-        session["new-role"] = new_role
+        session["update-data"]["new-role"] = new_role
         return redirect(url_for("update_bp.email_address"))
 
     data = {
@@ -100,7 +101,7 @@ def update_name():
 
     if request.method == "POST":
         session["change-route"] = "update_bp.update_name"
-        session["new-name"] = request.form.to_dict(flat=True)
+        session["update-data"]["new-name"] = request.form.to_dict(flat=True)
         return redirect(url_for("update_bp.check_your_answers"))
 
     return render_template(
@@ -118,7 +119,7 @@ def defer_intake():
 
     if request.method == "POST":
         session["change-route"] = "update_bp.defer_intake"
-        session["new-intake-year"] = request.form.get("new-intake-year")
+        session["update-data"]["deferral"] = {"new-intake-year": request.form.get("new-intake-year")}
         return redirect(url_for("update_bp.check_your_answers"))
 
     return render_template(
