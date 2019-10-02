@@ -5,6 +5,7 @@ from app.models import db as _db
 from config import TestConfig
 from app.models import *
 from modules.seed import clear_old_data, commit_data
+from flask import session
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -18,6 +19,7 @@ def test_client():
     # Establish an application context before running the tests.
     ctx = flask_app.test_request_context()
     ctx.push()
+    session["candidate-id"] = 1
 
     yield testing_client  # this is where the testing happens!
 
@@ -328,6 +330,12 @@ def logged_in_user(test_client):
         )
         yield
         test_client.get("/auth/logout")
+
+
+@pytest.fixture
+def candidate_in_session(test_client):
+    with test_client.session_transaction() as sess:
+        sess["candidate-id"] = 1
 
 
 @pytest.fixture

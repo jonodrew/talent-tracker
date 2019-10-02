@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-
+{% set candidate = session.get("candidate") %}
 {% block content %}
     <h2 class="govuk-heading-l">
         Updating details for {{ candidate.first_name }} {{ candidate.last_name }}
