@@ -1,7 +1,5 @@
-{% extends 'layout.html' %}
-
-{% block content %}
-    <form class="govuk-form-group" method="post">
+{% extends 'updates/update-layout.html' %}
+{% block form_content %}
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset" aria-describedby="which-email-address">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
@@ -25,8 +23,4 @@
                 </div>
             </fieldset>
         </div>
-        <div class="input submit">
-            <input type="submit" value="Continue" class="govuk-button">
-        </div>
-    </form>
 {% endblock %}
