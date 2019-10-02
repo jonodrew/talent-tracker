@@ -126,7 +126,7 @@ class TestSearchCandidate:
     ):
         data = {"candidate-email": email}
         test_client.post(
-            "/update/search-candidate",
+            "/update/",
             data=data,
             follow_redirects=True,
             headers={"content-type": "application/x-www-form-urlencoded"},
