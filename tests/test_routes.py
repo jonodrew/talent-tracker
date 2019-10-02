@@ -103,8 +103,11 @@ class TestRoleUpdate:
             "role-change": "1",
             "new-title": "Senior dev",
         }
-        test_client.post("/update/role", data=data)
-        assert data.keys() == session.get("new-role").keys()
+        with test_client.session_transaction() as sess:
+            sess["update-data"] = {}
+            sess["candidate-id"] = test_candidate.id
+        test_client.post("/update/role", data=data, follow_redirects=False)
+        assert data.keys() == session.get("update-data").get("new-role").keys()
 
 
 class TestSearchCandidate:
