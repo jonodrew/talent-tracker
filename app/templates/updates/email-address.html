@@ -3,35 +3,23 @@
 {% block content %}
     <form class="govuk-form-group" method="post">
         <div class="govuk-form-group">
-            <fieldset class="govuk-fieldset" aria-describedby="update-email-address-conditional-hint">
+            <fieldset class="govuk-fieldset" aria-describedby="which-email-address">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                    <h1 class="govuk-fieldset__heading">
-                        Has the candidate got a new email address?
-                    </h1>
+                    <h2 class="govuk-fieldset__heading">
+                        Which of the candidate's email addresses do you want to change?
+                    </h2>
                 </legend>
-                <span id="update-email-address-conditional-hint" class="govuk-hint">
-                    If they have, please supply the new email address
-                </span>
-                <div class="govuk-radios govuk-radios--conditional" data-module="radios">
+                <div class="govuk-radios govuk-radios" data-module="radios">
                     <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="update-email-address-conditional-1" name="update-email-address" type="radio" value="true" data-aria-controls="conditional-update-email-address-conditional-1">
-                        <label class="govuk-label govuk-radios__label" for="update-email-address-conditional-1">
-                            Yes
+                        <input class="govuk-radios__input" id="which-email-address-1" name="which-email-address" type="radio" value="primary-email" data-aria-controls="which-email-address-1">
+                        <label class="govuk-label govuk-radios__label" for="which-email-address-1">
+                            Primary email
                         </label>
                     </div>
-                    <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-update-email-address-conditional-1">
-                        <div class="govuk-form-group">
-                            <label class="govuk-label" for="new-email-address">
-                                Email address
-                            </label>
-                            <input class="govuk-input govuk-!-width-one-third" id="new-email-address" name="new-email-address" type="email" spellcheck="false">
-                        </div>
-
-                    </div>
                     <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="update-email-address-conditional-2" name="update-email-address" type="radio" value="false" data-aria-controls="conditional-update-email-address-conditional-2">
-                        <label class="govuk-label govuk-radios__label" for="update-email-address-conditional-2">
-                            No
+                        <input class="govuk-radios__input" id="which-email-address-2" name="which-email-address" type="radio" value="secondary-email" data-aria-controls="which-email-address-2">
+                        <label class="govuk-label govuk-radios__label" for="which-email-address-2">
+                            Secondary email
                         </label>
                     </div>
                 </div>

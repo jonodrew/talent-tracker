@@ -1,0 +1,14 @@
+{% set email_data = data.pop('new-email') %}
+<div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">
+       New {{ 'primary' if email_data.get('which-email') == 'primary-email' else 'secondary' }} email
+    </dt>
+    <dd class="govuk-summary-list__value">
+        {{ email_data.get('new-address') }}
+    </dd>
+    <dd class="govuk-summary-list__actions">
+        <a class="govuk-link" href="{{ url_for('update_bp.email_address') }}">
+            Change<span class="govuk-visually-hidden"> email</span>
+        </a>
+    </dd>
+</div>

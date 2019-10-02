@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <form class="govuk-form-group" method="post">
+        <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset" aria-describedby="update-email-address-conditional-hint">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    <h1 class="govuk-fieldset__heading">
+                        Has the candidate got a new email address?
+                    </h1>
+                </legend>
+                <div class="govuk-radios govuk-radios--conditional" data-module="radios">
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="update-email-address-1" name="update-email-address" type="radio" value="true" data-aria-controls="update-email-address-1">
+                        <label class="govuk-label govuk-radios__label" for="update-email-address-1">
+                            Yes
+                        </label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="update-email-address-2" name="update-email-address" type="radio" value="false" data-aria-controls="update-email-address-2">
+                        <label class="govuk-label govuk-radios__label" for="update-email-address-2">
+                            No
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="input submit">
+            <input type="submit" value="Continue" class="govuk-button">
+        </div>
+    </form>
+{% endblock %}
