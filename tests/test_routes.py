@@ -224,18 +224,18 @@ class TestAuthentication:
 
 
 class TestReports:
-    def test_get(self, test_client, logged_in_user):
-        result = test_client.get("/reports/")
-        assert "Select report" in result.data.decode("utf-8")
+    def test_get_promotions(self, test_client, logged_in_user):
+        result = test_client.get("/reports/promotions")
+        assert "Promotion report" in result.data.decode("utf-8")
 
-    def test_post(self, test_client, logged_in_user):
+    def test_post_promotions(self, test_client, logged_in_user):
         data = {
             "report-type": "promotions",
             "scheme": "FLS",
             "year": 2018,
             "attribute": "ethnicity",
         }
-        result = test_client.post("/reports/", data=data)
+        result = test_client.post("/reports/promotions", data=data)
         assert 200 == result.status_code
 
     def test_get_detailed_report(self, test_client, logged_in_user):
@@ -261,7 +261,7 @@ def test_audit_events(test_client, logged_in_user):
         "year": 2018,
         "attribute": "ethnicity",
     }
-    test_client.post("/reports/", data=data)
+    test_client.post("/reports/promotions", data=data)
     events: AuditEvent = AuditEvent.query.first()
     assert (
         "Generated a promotions report on ethnicity for FLS 2018 intake"
