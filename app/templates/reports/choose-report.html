@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <form class="form" action="" method="post">
+        <div class="govuk-form-group">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                <h2 class="govuk-fieldset__heading">
+                    Which kind of report would you like to generate?
+                </h2>
+            </legend>
+
+            <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="report-type-1" name="report-type" type="radio" value="promotion">
+                <label class="govuk-label govuk-radios__label" for="report-type-1">
+                    Promotions by characteristic
+                </label>
+            </div>
+            <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="report-type-2" name="report-type" type="radio" value="detailed">
+                <label class="govuk-label govuk-radios__label" for="report-type-2">
+                    Detailed report by role change type
+                </label>
+            </div>
+        </div>
+        <div class="input submit">
+            <input type="submit" value="Submit" class="govuk-button">
+        </div>
+    </form>
+{%  endblock %}
