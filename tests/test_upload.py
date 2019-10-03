@@ -15,7 +15,9 @@ class TestUpload:
         test_session.commit()
         directory = os.path.dirname(__file__)
         intake_filename = os.path.join(directory, f"data/{year}/test_csv.csv")
-        application_filename = os.path.join(directory, f"data/{year}/test_application_csv.csv")
+        application_filename = os.path.join(
+            directory, f"data/{year}/test_application_csv.csv"
+        )
         u = Upload(intake_filename, "FLS", "2020-3-3", application_filename)
         u.complete_upload()
         candidate = Candidate.query.filter_by(first_name="James").first()
