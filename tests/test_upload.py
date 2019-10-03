@@ -7,14 +7,15 @@ from datetime import date
 
 
 class TestUpload:
-    def test_create_candidate_data(self, test_session):
+    @pytest.mark.parametrize("year", ["2019"])
+    def test_create_candidate_data(self, year, test_session):
         sd.clear_old_data()
         sd.commit_data()
         test_session.add(Organisation(name="Foreign and Commonwealth Office"))
         test_session.commit()
         directory = os.path.dirname(__file__)
-        intake_filename = os.path.join(directory, "data/test_csv.csv")
-        application_filename = os.path.join(directory, "data/test_application_csv.csv")
+        intake_filename = os.path.join(directory, f"data/{year}/test_csv.csv")
+        application_filename = os.path.join(directory, f"data/{year}/test_application_csv.csv")
         u = Upload(intake_filename, "FLS", "2020-3-3", application_filename)
         u.complete_upload()
         candidate = Candidate.query.filter_by(first_name="James").first()
