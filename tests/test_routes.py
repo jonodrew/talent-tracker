@@ -215,9 +215,7 @@ class TestAuthentication:
     def test_login(self, logged_in_user):
         assert current_user.is_authenticated
 
-    @pytest.mark.parametrize(
-        "url", ["/update/", "/reports/", "/candidates/candidate/1"]
-    )
+    @pytest.mark.parametrize("url", ["/update/", "/reports/", "/candidates/1"])
     def test_non_logged_in_users_are_redirected_to_login(self, url, test_client):
         with test_client:
             response = test_client.get(url, follow_redirects=False)
@@ -252,7 +250,7 @@ class TestReports:
 
 class TestProfile:
     def test_get(self, test_client, logged_in_user, test_candidate_applied_to_fls):
-        result = test_client.get("/candidates/candidate/1")
+        result = test_client.get("/candidates/1")
         assert "Career profile for Testy Candidate" in result.data.decode("utf-8")
 
 
