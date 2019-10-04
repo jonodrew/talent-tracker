@@ -2,6 +2,7 @@ from app.models import *
 from datetime import datetime, date
 from typing import List
 import pandas as pd
+import random
 
 
 class Upload:
@@ -11,6 +12,7 @@ class Upload:
         programme: str,
         scheme_start_date: str,
         application_filepath: str,
+        redact_personal_data=True,
     ):
         self.intake_filepath = intake_filepath
         self.application_filepath = application_filepath
@@ -19,11 +21,12 @@ class Upload:
         self.intake_dataframe = pd.read_csv(self.intake_filepath)
         self.application_dataframe = pd.read_csv(self.application_filepath)
         self.joined_dataframe: pd.DataFrame = self.join_csvs()
+        self.row_reader = RedactedRow if redact_personal_data else Row
 
     def complete_upload(self):
         for i in range(len(self.joined_dataframe.index)):
             row_series = self.joined_dataframe.iloc[i]
-            row = Row(row_series, self.scheme_start_date, self.scheme)
+            row = self.row_reader(row_series, self.scheme_start_date, self.scheme)
             db.session.add(row.get_candidate())
         db.session.commit()
 
@@ -160,3 +163,46 @@ class Row:
                 ).first(),
             )
         )
+
+
+class RedactedRow(Row):
+    def __init__(
+        self, row: pd.Series, scheme_start_date: datetime.date, scheme: Scheme
+    ):
+        super().__init__(row, scheme_start_date, scheme)
+
+    def _get_title_or_not_provided(self):
+        return "[REDACTED-JOB TITLE]"
+
+    def _create_candidate_data(self):
+        c = Candidate(
+            joining_date=date(self.data.get("CS Joining Year"), 1, 1),
+            completed_fast_stream=self._yes_is_true_no_is_false_translator(
+                self.data["Have you completed  Fast Stream?"]
+            ),
+            first_name="[REDACTED - FIRST NAME]",
+            last_name="[REDACTED - LAST NAME]",
+            caring_responsibility=self._yes_is_true_no_is_false_translator(
+                self.data.get("Caring Responsibility")
+            ),
+            long_term_health_condition=random.randint(0, 1),
+            age_range=AgeRange.query.filter_by(
+                value=self.data.get("Age Group")
+            ).first(),
+            working_pattern=WorkingPattern.query.filter_by(
+                value=self.data.get("Working Pattern")
+            ).first(),
+            belief=random.choice(Belief.query.all()),
+            sexuality=random.choice(Sexuality.query.all()),
+            ethnicity=random.choice(Ethnicity.query.all()),
+            main_job_type=random.choice(MainJobType.query.all()),
+            gender=random.choice(Gender.query.all()),
+            joining_grade=Grade.query.filter_by(
+                value=self.data.get("CS Joining Grade")
+            ).first(),
+        )
+        addresses = self._separate_email_addresses(self.data.get("Email Address_y"))
+        c.email_address = f"{self.data.PerID}@gov.uk"
+        if len(addresses) > 1:
+            c.secondary_email_address = "[REDACTED - EMAIL ADDRESS]"
+        return c
