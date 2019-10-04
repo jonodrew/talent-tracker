@@ -88,9 +88,7 @@ class Row:
                 profession=Profession.query.filter_by(
                     value=self.data.Profession_intake
                 ).first(),
-                grade=Grade.query.filter_by(
-                    value=self.data.get("Current Grade")[0:7]
-                ).first(),
+                grade=self._grade_processor(self.data.get("Current Grade")),
                 location=Location.query.filter_by(
                     value=self.data.Location_intake
                 ).first(),
@@ -106,12 +104,13 @@ class Row:
         else:
             return Grade.query.filter_by(value=grade).first()
 
-    def _process_organisation(self, department_field, alb_field) -> Organisation:
-        dept = self._get_org_or_create(department_field, dept=True)
+    @staticmethod
+    def _process_organisation(department_field, alb_field) -> Organisation:
+        dept = Row._get_org_or_create(department_field, dept=True)
         if alb_field == "Not Applicable":
             return dept
         else:
-            alb = self._get_org_or_create(alb_field, alb=True)
+            alb = Row._get_org_or_create(alb_field, alb=True)
             alb.parent_organisation_id = dept.id
             db.session.add(alb)
             return alb
@@ -179,6 +178,12 @@ class Row:
             c.secondary_email_address = addresses[1]
         return c
 
+    def _aspiration_processor(self):
+        if self.data.get("Aspiration") == "Remain at Grade":
+            return Grade.query.filter_by(value=self.data.get("Current Grade")).first()
+        else:
+            return Row._grade_processor(self.data.get("Aspiration"))
+
     def _add_application(self):
         self.candidate.applications.append(
             Application(
@@ -188,6 +193,7 @@ class Row:
                 meta=self._empty_translator(self.data.get("META", False)),
                 delta=self._empty_translator(self.data.get("DELTA", False)),
                 cohort=self.data.Cohort,
+                aspirational_grade=self._grade_processor(self.data.Aspiration),
             )
         )
 
