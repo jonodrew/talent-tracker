@@ -1,3 +1,4 @@
+import os
 import pytest
 from datetime import date
 from app import create_app
@@ -6,6 +7,7 @@ from config import TestConfig
 from app.models import *
 from modules.seed import clear_old_data, commit_data
 from flask import session
+from modules.upload import Upload
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -345,3 +347,20 @@ def seed_data(test_client):
         commit_data()
         yield
         clear_old_data()
+
+
+@pytest.fixture
+def test_upload_object():
+    def _upload_object(intake_file_path, application_file_path, redacted=True):
+        directory = os.path.dirname(__file__)
+        intake_file_path = os.path.join(directory, intake_file_path)
+        application_file_path = os.path.join(directory, application_file_path)
+        return Upload(
+            intake_file_path,
+            "FLS",
+            "2020-03-01",
+            application_file_path,
+            redact_personal_data=redacted,
+        )
+
+    return _upload_object
