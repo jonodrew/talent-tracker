@@ -155,5 +155,8 @@ class Row:
                 meta=self._empty_translator(self.data.get("META", False)),
                 delta=self._empty_translator(self.data.get("DELTA", False)),
                 cohort=self.data.Cohort,
+                aspirational_grade=Grade.query.filter_by(
+                    value=self.data.Aspiration
+                ).first(),
             )
         )
