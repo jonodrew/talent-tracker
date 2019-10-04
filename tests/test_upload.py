@@ -4,10 +4,11 @@ import pytest
 from datetime import date
 
 
+@pytest.mark.parametrize("scheme", ["FLS"])
+@pytest.mark.parametrize("year", ["2019"])
 class TestUpload:
-    @pytest.mark.parametrize("year", ["2019"])
     def test_create_candidate_data(
-        self, year, test_upload_object, detailed_candidate, test_session
+        self, year, scheme, test_upload_object, detailed_candidate, test_session
     ):
         sd.clear_old_data()
         sd.commit_data()
@@ -15,6 +16,7 @@ class TestUpload:
             f"tests/data/{year}/test_csv.csv",
             f"tests/data/{year}/test_application_csv.csv",
             False,
+            scheme,
         )
         u.complete_upload()
         candidate = Candidate.query.filter_by(first_name="James").first()
@@ -32,9 +34,8 @@ class TestUpload:
             ("Surname_x", "last_name", "[REDACTED - LAST NAME]"),
         ],
     )
-    @pytest.mark.parametrize("year", ["2019"])
     def test_redact_replaces_personal_data_with_redacted(
-        self, year, csv_field, db_field, new_data, test_upload_object
+        self, year, scheme, csv_field, db_field, new_data, test_upload_object
     ):
         sd.clear_old_data()
         sd.commit_data()
@@ -42,19 +43,20 @@ class TestUpload:
             f"tests/data/{year}/test_csv.csv",
             f"tests/data/{year}/test_application_csv.csv",
             True,
+            scheme,
         )
         u.complete_upload()
         candidate = Candidate.query.filter_by(email_address="PU007@gov.uk").first()
         assert candidate.__getattribute__(db_field) == new_data
 
-    @pytest.mark.parametrize("year", ["2019"])
     def test_redact_mixes_up_protected_characteristics(
-        self, year, test_session, detailed_candidate, test_upload_object
+        self, year, scheme, test_session, detailed_candidate, test_upload_object
     ):
         u = test_upload_object(
             f"tests/data/{year}/test_csv.csv",
             f"tests/data/{year}/test_application_csv.csv",
             True,
+            scheme,
         )
         u.complete_upload()
         candidate = Candidate.query.filter_by(email_address="PU007@gov.uk").first()

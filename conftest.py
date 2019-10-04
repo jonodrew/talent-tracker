@@ -351,13 +351,15 @@ def seed_data(test_client):
 
 @pytest.fixture
 def test_upload_object():
-    def _upload_object(intake_file_path, application_file_path, redacted=True):
+    def _upload_object(
+        intake_file_path, application_file_path, redacted=True, scheme: str = "FLS"
+    ):
         directory = os.path.dirname(__file__)
         intake_file_path = os.path.join(directory, intake_file_path)
         application_file_path = os.path.join(directory, application_file_path)
         return Upload(
             intake_file_path,
-            "FLS",
+            scheme,
             "2020-03-01",
             application_file_path,
             redact_personal_data=redacted,
