@@ -1,6 +1,4 @@
-from modules.upload import Upload
-import os
-from app.models import Candidate, Organisation
+from app.models import Candidate
 import modules.seed as sd
 import pytest
 from datetime import date
@@ -10,7 +8,7 @@ from datetime import date
 @pytest.mark.parametrize("year", ["2019"])
 class TestUpload:
     def test_create_candidate_data(
-        self, year, scheme, test_upload_object, detailed_candidate, test_session
+        self, year, test_upload_object, detailed_candidate, test_session
     ):
         sd.clear_old_data()
         sd.commit_data()
