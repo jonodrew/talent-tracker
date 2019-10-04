@@ -11,7 +11,6 @@ class Upload:
         programme: str,
         scheme_start_date: str,
         application_filepath: str,
-        redact_personal_data=False,
     ):
         self.intake_filepath = intake_filepath
         self.application_filepath = application_filepath
@@ -20,7 +19,6 @@ class Upload:
         self.intake_dataframe = pd.read_csv(self.intake_filepath)
         self.application_dataframe = pd.read_csv(self.application_filepath)
         self.joined_dataframe: pd.DataFrame = self.join_csvs()
-        self.redact = redact_personal_data
 
     def complete_upload(self):
         for i in range(len(self.joined_dataframe.index)):
