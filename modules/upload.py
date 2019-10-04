@@ -78,11 +78,9 @@ class Row:
         self.candidate.roles.append(
             Role(
                 role_name=self._get_title_or_not_provided(),
-                organisation_id=Organisation.query.filter_by(
+                organisation=Organisation.query.filter_by(
                     name=self.data.Department_x
-                )
-                .first()
-                .id,
+                ).first(),
                 profession=Profession.query.filter_by(
                     value=self.data.Profession_x
                 ).first(),
