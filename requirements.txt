@@ -20,7 +20,7 @@ gunicorn==19.9.0
 idna==2.8
 importlib-metadata==0.23
 itsdangerous==1.1.0
-Jinja2==2.10.1
+Jinja2==2.10.3
 lettuce==0.2.23
 linecache2==1.0.0
 Mako==1.1.0
