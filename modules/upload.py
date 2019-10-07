@@ -137,7 +137,9 @@ class Row:
 
     def _create_candidate_data(self):
         c = Candidate(
-            joining_date=date(self.data.get("CS Joining Year"), 1, 1),
+            joining_date=datetime.strptime(
+                self.data.get("CS Joining Year"), "%d/%m/%Y"
+            ),
             completed_fast_stream=self._yes_is_true_no_is_false_translator(
                 self.data["Have you completed  Fast Stream?"]
             ),
