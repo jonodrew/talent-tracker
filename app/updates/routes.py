@@ -9,22 +9,10 @@ from app.models import (
     Organisation,
     Location,
     Profession,
-    Role,
     Promotion,
 )
 from app.updates import update_bp, get_candidate
 from sqlalchemy import or_
-
-
-@update_bp.route("/results")
-def results():
-    candidates = Candidate.query.all()
-    return render_template(
-        "results.html",
-        candidates=candidates,
-        heading="Search results",
-        accordion_data=[{"heading": "Heading", "content": "Lorem ipsum, blah blah"}],
-    )
 
 
 @update_bp.route("/", methods=["POST", "GET"])
@@ -282,12 +270,3 @@ def post_your_answers():
 @get_candidate
 def complete():
     return render_template("updates/complete.html")
-
-
-@update_bp.route("/candidate")
-def candidate():
-    return render_template(
-        "candidates/profile.html",
-        roles=Role.query.order_by(Role.date_started.desc()).all(),
-        candidate=Candidate.query.get(2),
-    )
