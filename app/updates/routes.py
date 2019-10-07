@@ -12,7 +12,7 @@ from app.models import (
     Role,
     Promotion,
 )
-from app.updates import update_bp
+from app.updates import update_bp, get_candidate
 from sqlalchemy import or_
 
 
@@ -48,6 +48,7 @@ def index():
 
 
 @update_bp.route("/choose-update", methods=["POST", "GET"])
+@get_candidate
 def choose_update():
     next_steps = {
         "role": "update_bp.update_role",
@@ -62,6 +63,7 @@ def choose_update():
 
 
 @update_bp.route("/role", methods=["POST", "GET"])
+@get_candidate
 def update_role():
     candidate_id = session.get("candidate-id")
     if not candidate_id:
@@ -94,6 +96,7 @@ def update_role():
 
 
 @update_bp.route("/name", methods=["POST", "GET"])
+@get_candidate
 def update_name():
     candidate_id = session.get("candidate-id")
     if not candidate_id:
@@ -112,6 +115,7 @@ def update_name():
 
 
 @update_bp.route("/deferral", methods=["POST", "GET"])
+@get_candidate
 def defer_intake():
     candidate_id = session.get("candidate-id")
     if not candidate_id:
@@ -132,6 +136,7 @@ def defer_intake():
 
 
 @update_bp.route("/email-address", methods=["POST", "GET"])
+@get_candidate
 def email_address():
     if request.method == "POST":
         if request.form.get("update-email-address") == "true":
@@ -143,6 +148,7 @@ def email_address():
 
 
 @update_bp.route("/new-email-address", methods=["POST", "GET"])
+@get_candidate
 def new_email_address():
     if request.method == "POST":
         update_data = session["update-data"]
@@ -155,6 +161,7 @@ def new_email_address():
 
 
 @update_bp.route("/update-email-address", methods=["POST", "GET"])
+@get_candidate
 def update_email():
     if request.method == "POST":
         update_data = session["update-data"]
@@ -175,6 +182,7 @@ def update_email():
 
 
 @update_bp.route("/check-your-answers", methods=["POST", "GET"])
+@get_candidate
 def check_your_answers():
     def prettify_string(string_to_prettify):
         string_as_list = list(string_to_prettify)
@@ -271,6 +279,7 @@ def post_your_answers():
 
 
 @update_bp.route("/complete", methods=["GET"])
+@get_candidate
 def complete():
     return render_template("updates/complete.html")
 
