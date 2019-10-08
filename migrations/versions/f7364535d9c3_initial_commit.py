@@ -27,7 +27,7 @@ def upgrade():
     op.create_table(
         "grade",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("value", sa.String(length=50), nullable=True),
+        sa.Column("value", sa.String(length=100), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )
 

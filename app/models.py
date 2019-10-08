@@ -194,7 +194,7 @@ class Organisation(db.Model):
 
 class Grade(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    value = db.Column(db.String(50))
+    value = db.Column(db.String(100))
     rank = db.Column(db.Integer, nullable=False)
 
     @staticmethod
