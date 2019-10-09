@@ -20,16 +20,20 @@ def generate_known_candidate():
         last_name="Candidate",
         completed_fast_stream=True,
         joining_grade=Grade.query.filter(Grade.value.like("%Faststream%")).first(),
-        age_range_id=2,
-        ethnicity_id=1,
-        working_pattern_id=1,
-        belief_id=1,
-        gender_id=1,
-        sexuality_id=1,
+        age_range=AgeRange.query.filter_by(value="25-29").first(),
+        ethnicity=Ethnicity.query.filter_by(value="Arab").first(),
+        working_pattern=WorkingPattern.query.filter_by(value="Full time").first(),
+        belief=Belief.query.filter_by(value="No Religion").first(),
+        gender=Gender.query.filter_by(value="Prefer not to say").first(),
+        sexuality=Sexuality.query.filter_by(value="Bisexual").first(),
         roles=[
             Role(
                 date_started=date(2015, 9, 2),
-                profession_id=1,
+                profession_id=Profession.query.filter_by(
+                    value="Digital, data & technology"
+                )
+                .first()
+                .id,
                 role_change_id=2,
                 organisation_id=Organisation.query.filter(
                     Organisation.name == "Cabinet Office"
@@ -40,7 +44,12 @@ def generate_known_candidate():
                 location=Location.query.filter_by(value="London").first(),
             )
         ],
-        applications=[Application(scheme_id=1, scheme_start_date=date(2018, 3, 1))],
+        applications=[
+            Application(
+                scheme_id=Scheme.query.filter_by(name="FLS").first().id,
+                scheme_start_date=date(2018, 3, 1),
+            )
+        ],
     )
 
 
@@ -106,20 +115,24 @@ def promote_candidate(candidate: Candidate, role_change_type=None):
                 role_change=Promotion.query.filter(
                     Promotion.value == "substantive"
                 ).first(),
-                organisation_id=14,
-                location_id=2,
+                organisation=Organisation.query.filter_by(
+                    name="Cabinet Office"
+                ).first(),
+                location=Location.query.filter_by(value="London").first(),
                 role_name="First role",
-                grade_id=5,
+                grade=Grade.query.filter_by(rank=5).first(),
             ),
             Role(
                 date_started=date(2019, 6, 1),
                 role_change=Promotion.query.filter(
                     Promotion.value == f"{role_change_type}"
                 ).first(),
-                organisation_id=14,
-                location_id=2,
+                organisation=Organisation.query.filter_by(
+                    name="Cabinet Office"
+                ).first(),
+                location=Location.query.filter_by(value="London").first(),
                 role_name="Second role",
-                grade_id=4,
+                grade=Grade.query.filter_by(rank=4).first(),
             ),
         ]
     )
@@ -156,6 +169,15 @@ class SeedData:
     def seed_data(self):
         for sheet in self.sheets_to_upload:
             db.session.add_all(self._process_from_spreadsheet(sheet))
+        db.session.add_all([Scheme(id=3, name="FLS"), Scheme(id=4, name="SLS")])
+        db.session.add_all(
+            [
+                Promotion(id=1, value="temporary"),
+                Promotion(id=2, value="substantive"),
+                Promotion(id=3, value="level transfer"),
+                Promotion(id=4, value="demotion"),
+            ]
+        )
         db.session.commit()
 
     def _process_from_spreadsheet(self, sheet_data_tuple: Tuple[str, db.Model]):
@@ -179,7 +201,7 @@ def commit_data(seed_data_filepath: str):
     SeedData(seed_data_filepath).seed_data()
     known_candidate = generate_known_candidate()
     db.session.add(known_candidate)
-    db.session.add_all([Scheme(id=1, name="FLS"), Scheme(id=2, name="SLS")])
+
     random_promoted_fls_candidates = [
         promote_candidate(candidate) if i % 2 == 0 else candidate
         for i, candidate in enumerate(random_candidates("FLS", 100))
