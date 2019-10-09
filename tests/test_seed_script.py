@@ -4,7 +4,7 @@ import pytest
 
 
 def test_commit_data(seed_data):
-    for item in [(Candidate, 201), (Organisation, 42), (Grade, 13), (Profession, 27)]:
+    for item in [(Candidate, 201), (Organisation, 408), (Grade, 13), (Profession, 27)]:
         assert len(item[0].query.all()) == item[1]
 
 

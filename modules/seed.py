@@ -1,256 +1,14 @@
 import random
 from string import ascii_lowercase
+from typing import Dict, Tuple
 from app.models import *
 from datetime import date
 import os
+import pandas as pd
 
 
 def random_string(length: int) -> str:
     return "".join([random.choice(ascii_lowercase) for i in range(length)])
-
-
-def generate_random_fixed_data():
-
-    organisation_names = [
-        "Attorney General's Office",
-        "The Charity Commission",
-        "Competition Markets Authority",
-        "Crown Prosecution Service",
-        "Department for Business, Energy & Industrial Strategy",
-        "Department for Digital, Culture, Media and Sport",
-        "Department for Education",
-        "Department for Environment Food and Rural Affairs (DEFRA)",
-        "Department for Exiting the European Union",
-        "Department for International Development",
-        "Department for International Trade",
-        "Department for Transport",
-        "Department of Health and Social Care",
-        "Food Standards Agency",
-        "Foreign & Commonwealth Office",
-        "Forestry Commission",
-        "Government Actuary's Department",
-        "Government Legal Department",
-        "HM Land Registry",
-        "HM Revenue & Customs",
-        "HM Treasury",
-        "Home Office",
-        "Ministry of Defence",
-        "Ministry of Housing, Communities and Local Govt",
-        "Ministry of Justice",
-        "The National Archives",
-        "National Crime Agency",
-        "Northern Ireland Office",
-        "National Savings and Investments (NS&I)",
-        "Office for Standards in Education (Ofsted)",
-        "Office of Gas and Electricity Markets (Ofgem)",
-        "Office of Qualifications and Examinations Regulation (Ofqual)",
-        "Office of Rail and Road",
-        "Other",
-        "The Water Services Regulation Authority (Ofwat)",
-        "Scottish Government",
-        "Serious Fraud Office",
-        "Supreme Court of the United Kingdom",
-        "UK Export Finance",
-        "UK Statistics Authority",
-        "Welsh Government",
-    ]
-
-    organisations = [
-        Organisation(id=i, name=value, department=True)
-        for i, value in enumerate(organisation_names)
-    ]
-    professions = [
-        "Communication",
-        "Digital, data & technology",
-        "Government Commercial Function",
-        "Government Corporate Finance",
-        "Government Economics Service",
-        "Government Finance",
-        "Government Legal Service",
-        "Government Operational Research",
-        "Government Property Profession",
-        "Government Social Research",
-        "Government Statistical Service",
-        "Government Veterinary Profession",
-        "Human Resources",
-        "Intelligence Analysis",
-        "Internal Audit",
-        "Knowledge and Information Management",
-        "Medical profession",
-        "Operational delivery",
-        "Other",
-        "Planning professions",
-        "Policy",
-        "Prefer not to say",
-        "Project delivery",
-        "Psychology profession",
-        "Science & engineering",
-        "Security profession",
-        "Tax",
-    ]
-
-    locations = [
-        "East Midlands",
-        "East of England",
-        "London",
-        "North East England",
-        "North West England",
-        "Northern Ireland",
-        "Overseas",
-        "Prefer not to say",
-        "Scotland",
-        "South East England",
-        "South West England",
-        "Wales",
-        "West Midlands",
-        "Yorkshire & the Humber",
-    ]
-
-    genders = [
-        Gender(id=i, value=value)
-        for i, value in enumerate(
-            ["Male", "Female", "I identify in another way", "Prefer not to say"]
-        )
-    ]
-
-    organisations.append(Organisation(id=len(organisations) + 1, name="Cabinet Office"))
-    grades = [
-        "Prefer not to say",
-        "AA – Administrative Assistant",
-        "AO – Administrative Officer",
-        "EO – Executive Officer",
-        "HEO – Higher Executive Officer",
-        "HEO (D) – Faststream",
-        "SEO – Senior Executive Officer",
-        "Grade 7",
-        "Grade 6",
-        "SCS1 – Deputy Director",
-        "SCS2 – Director",
-        "SCS3 – Director General",
-        "SCS 4 – Permanent Secretary",
-    ]
-    grades.reverse()
-
-    bame_ethnic_groups = [
-        "Any other Asian background",
-        "Any other Black/African/Caribbean background",
-        "Any other Ethnic background",
-        "Any other mixed/multiple ethnic background",
-        "Arab",
-        "Asian or Asian British - Bangladeshi",
-        "Asian or Asian British - Chinese",
-        "Asian or Asian British - Indian",
-        "Asian or Asian British - Pakistani",
-        "Black or Black British African",
-        "Black or Black British Caribbean",
-        "Mixed - White and Asian",
-        "Mixed - White and Black African",
-        "Mixed - White and Black Caribbean",
-        "White - Gypsy or Irish Traveller",
-    ]
-    non_bame_ethnic_groups = [
-        "Any other white background",
-        "Prefer not to say",
-        "White - Irish",
-        "White English/Welsh/Scottish/Northern Irish/British",
-    ]
-    sexual_orientation = [
-        Sexuality(id=i, value=value)
-        for i, value in enumerate(
-            [
-                "Bisexual",
-                "Gay or lesbian",
-                "I identify in another way",
-                "Prefer not to say",
-                "Straight/heterosexual",
-            ]
-        )
-    ]
-    ethnic_groups = [Ethnicity(value=item, bame=True) for item in bame_ethnic_groups]
-    ethnic_groups.extend(
-        [Ethnicity(value=item, bame=False) for item in non_bame_ethnic_groups]
-    )
-    for i, e in enumerate(ethnic_groups):
-        e.id = i
-    grades = [Grade(id=i, value=grade, rank=i) for i, grade in enumerate(grades)]
-    professions = [
-        Profession(id=i, value=string) for i, string in enumerate(professions)
-    ]
-    locations = [Location(id=i, value=string) for i, string in enumerate(locations)]
-    beliefs = [
-        Belief(id=i, value=string)
-        for i, string in enumerate(
-            [
-                "Agnostic",
-                "Buddhist",
-                "Christian",
-                "Hindu",
-                "Jewish",
-                "Muslim",
-                "No Religion",
-                "Other Religion",
-                "Prefer Not To Say",
-                "Sikh",
-            ]
-        )
-    ]
-    ages = [
-        AgeRange(id=i, value=string)
-        for i, string in enumerate(
-            [
-                "16-19",
-                "20-24",
-                "25-29",
-                "30-34",
-                "35-39",
-                "40-44",
-                "45-49",
-                "50-54",
-                "55-59",
-                "60-64",
-            ]
-        )
-    ]
-    working_patterns = [
-        WorkingPattern(id=i, value=string)
-        for i, string in enumerate(
-            [
-                "Full time",
-                "Job share",
-                "Part time",
-                "Prefer not to say",
-                "Flexible working",
-                "Term time",
-            ]
-        )
-    ]
-
-    promotions = [
-        Promotion(id=1, value="temporary"),
-        Promotion(id=2, value="substantive"),
-        Promotion(id=3, value="level transfer"),
-        Promotion(id=4, value="demotion"),
-    ]
-
-    return {
-        "organisations": organisations,
-        "grades": grades,
-        "professions": professions,
-        "locations": locations,
-        "ethnicities": ethnic_groups,
-        "schemes": [Scheme(id=1, name="FLS"), Scheme(id=2, name="SLS")],
-        "ages": ages,
-        "genders": genders,
-        "sexuality": sexual_orientation,
-        "beliefs": beliefs,
-        "working_patterns": working_patterns,
-        "promotions": promotions,
-        "job_types": [
-            MainJobType(
-                id=1, value="Civil Servant", lower_socio_economic_background=True
-            )
-        ],
-    }
 
 
 def generate_known_candidate():
@@ -375,11 +133,55 @@ def random_candidates(scheme: str, number: int):
     ]
 
 
+class SeedData:
+    def __init__(self, path_to_spreadsheet: str = "./data/database-content.xlsx"):
+        self.dict_of_dataframes: Dict[str, pd.DataFrame] = pd.read_excel(
+            path_to_spreadsheet, sheet_name=None
+        )
+        self.sheets_to_upload = [
+            ("Department", Organisation),
+            ("ALB", Organisation),
+            ("Gender", Gender),
+            ("Sexual Orientation", Sexuality),
+            ("Ethnicity", Ethnicity),
+            ("Grade", Grade),
+            ("Profession", Profession),
+            ("Location", Location),
+            ("Age", AgeRange),
+            ("ReligionBelief", Belief),
+            ("Work Pattern", WorkingPattern),
+            ("main job type", MainJobType),
+        ]
+
+    def seed_data(self):
+        for sheet in self.sheets_to_upload:
+            db.session.add_all(self._process_from_spreadsheet(sheet))
+        db.session.commit()
+
+    def _process_from_spreadsheet(self, sheet_data_tuple: Tuple[str, db.Model]):
+        sheet_as_df = self.dict_of_dataframes.get(sheet_data_tuple[0])
+        output = sheet_as_df.apply(
+            self._process_row, args=(sheet_data_tuple[1],), axis=1
+        )
+        return list(output)
+
+    def _process_row(self, row_as_series: pd.Series, model: db.Model):
+        value_or_name = row_as_series.keys()[0]
+        r = model()
+        setattr(r, value_or_name, row_as_series[0])
+        if len(row_as_series.keys()) > 1:
+            secondary_attribute = row_as_series.keys()[1]
+            setattr(r, secondary_attribute, row_as_series[secondary_attribute])
+        return r
+
+
 def commit_data():
-    for key, value in generate_random_fixed_data().items():
-        db.session.add_all(value)
+    SeedData(
+        "/Users/jonathankerr/projects/talent-tracker/data/database-content.xlsx"
+    ).seed_data()
     known_candidate = generate_known_candidate()
     db.session.add(known_candidate)
+    db.session.add_all([Scheme(id=1, name="FLS"), Scheme(id=2, name="SLS")])
     random_promoted_fls_candidates = [
         promote_candidate(candidate) if i % 2 == 0 else candidate
         for i, candidate in enumerate(random_candidates("FLS", 100))
