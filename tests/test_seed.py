@@ -9,18 +9,16 @@ import pytest
 )
 class TestSeedData:
     def test_ethnicity_process(
-        self, spreadsheet_data_tuple, count, test_session, class_seed_data
+        self, spreadsheet_data_tuple, count, blank_session, class_seed_data
     ):
         sd = class_seed_data
         out = sd._process_from_spreadsheet(spreadsheet_data_tuple)
         assert type(out) is list
         assert len(out) == count
 
-    def test_commit(self, spreadsheet_data_tuple, count, test_session, class_seed_data):
+    def test_commit(self, spreadsheet_data_tuple, count, class_seed_data):
         sd = class_seed_data
         sd.sheets_to_upload = [spreadsheet_data_tuple]
-        spreadsheet_data_tuple[1].query.delete()
-        test_session.commit()
         sd.seed_data()
         assert len(spreadsheet_data_tuple[1].query.all()) == count
 

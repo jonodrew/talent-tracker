@@ -27,7 +27,7 @@ def test_client():
     ctx.pop()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="session", autouse=True)
 def db(test_client):
     _db.app = test_client
     _db.create_all()
@@ -38,7 +38,7 @@ def db(test_client):
 
 
 @pytest.fixture(scope="function", autouse=True)
-def test_session(db):
+def blank_session(db):
     connection = db.engine.connect()
     transaction = connection.begin()
 
@@ -47,12 +47,21 @@ def test_session(db):
 
     db.session = session_
 
+    yield session_
+
+    transaction.rollback()
+    connection.close()
+    session_.remove()
+
+
+@pytest.fixture(scope="function", autouse=False)
+def test_session(blank_session):
     test_user = User(email="Test User")
     test_user.set_password("Password")
-    db.session.add(test_user)
+    blank_session.add(test_user)
 
-    db.session.add_all([Scheme(id=1, name="FLS"), Scheme(id=2, name="SLS")])
-    db.session.add_all(
+    blank_session.add_all([Scheme(id=1, name="FLS"), Scheme(id=2, name="SLS")])
+    blank_session.add_all(
         [
             Promotion(id=1, value="substantive promotion"),
             Promotion(id=2, value="temporary promotion"),
@@ -60,7 +69,7 @@ def test_session(db):
             Promotion(id=4, value="demotion"),
         ]
     )
-    db.session.add_all(
+    blank_session.add_all(
         [
             Grade(id=2, value="Grade 7", rank=6),
             Grade(id=3, value="Grade 6", rank=5),
@@ -68,14 +77,10 @@ def test_session(db):
             Grade(id=1, value="Admin Assistant (AA)", rank=7),
         ]
     )
-    db.session.add(Candidate(id=1))
-    db.session.commit()
+    blank_session.add(Candidate(id=1))
+    blank_session.commit()
 
-    yield session_
-
-    transaction.rollback()
-    connection.close()
-    session_.remove()
+    yield blank_session
 
 
 @pytest.fixture
@@ -324,7 +329,7 @@ def detailed_candidate(test_candidate, test_session):
 
 
 @pytest.fixture
-def logged_in_user(test_client):
+def logged_in_user(test_client, test_session):
     with test_client:
         test_client.post(
             "/auth/login", data={"email-address": "Test User", "password": "Password"}
@@ -347,7 +352,7 @@ def seed_data(test_client):
             os.path.join(str(os.getcwd()), "tests/data/test-database-content.xlsx")
         )
         yield
-        clear_old_data()
+        # clear_old_data()
 
 
 @pytest.fixture
