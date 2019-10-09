@@ -1,4 +1,3 @@
-from modules.seed import SeedData
 from app.models import Ethnicity, Candidate, Organisation, Profession, Grade
 from modules.seed import clear_old_data
 import pytest
@@ -9,18 +8,16 @@ import pytest
     [(("Ethnicity", Ethnicity), 19), (("Grade", Grade), 13)],
 )
 class TestSeedData:
-    def test_ethnicity_process(self, spreadsheet_data_tuple, count, test_session):
-        sd = SeedData(
-            "/Users/jonathankerr/projects/talent-tracker/data/database-content.xlsx"
-        )
+    def test_ethnicity_process(
+        self, spreadsheet_data_tuple, count, test_session, class_seed_data
+    ):
+        sd = class_seed_data
         out = sd._process_from_spreadsheet(spreadsheet_data_tuple)
         assert type(out) is list
         assert len(out) == count
 
-    def test_commit(self, spreadsheet_data_tuple, count, test_session):
-        sd = SeedData(
-            "/Users/jonathankerr/projects/talent-tracker/data/database-content.xlsx"
-        )
+    def test_commit(self, spreadsheet_data_tuple, count, test_session, class_seed_data):
+        sd = class_seed_data
         sd.sheets_to_upload = [spreadsheet_data_tuple]
         spreadsheet_data_tuple[1].query.delete()
         test_session.commit()
@@ -32,7 +29,7 @@ class TestSeedScript:
     def test_commit_data(self, seed_data):
         for item in [
             (Candidate, 201),
-            (Organisation, 408),
+            (Organisation, 2),
             (Grade, 13),
             (Profession, 27),
         ]:

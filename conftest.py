@@ -1,10 +1,11 @@
 import pytest
+import os
 from datetime import date
 from app import create_app
 from app.models import db as _db
 from config import TestConfig
 from app.models import *
-from modules.seed import clear_old_data, commit_data
+from modules.seed import clear_old_data, commit_data, SeedData
 from flask import session
 
 
@@ -342,6 +343,14 @@ def candidate_in_session(test_client):
 def seed_data(test_client):
     with test_client:
         clear_old_data()
-        commit_data()
+        commit_data(
+            os.path.join(str(os.getcwd()), "tests/data/test-database-content.xlsx")
+        )
         yield
         clear_old_data()
+
+
+@pytest.fixture
+def class_seed_data():
+    filepath = os.path.join(str(os.getcwd()), "tests/data/test-database-content.xlsx")
+    return SeedData(filepath)

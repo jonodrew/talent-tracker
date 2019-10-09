@@ -134,7 +134,7 @@ def random_candidates(scheme: str, number: int):
 
 
 class SeedData:
-    def __init__(self, path_to_spreadsheet: str = "./data/database-content.xlsx"):
+    def __init__(self, path_to_spreadsheet: str):
         self.dict_of_dataframes: Dict[str, pd.DataFrame] = pd.read_excel(
             path_to_spreadsheet, sheet_name=None
         )
@@ -175,10 +175,8 @@ class SeedData:
         return r
 
 
-def commit_data():
-    SeedData(
-        "/Users/jonathankerr/projects/talent-tracker/data/database-content.xlsx"
-    ).seed_data()
+def commit_data(seed_data_filepath: str):
+    SeedData(seed_data_filepath).seed_data()
     known_candidate = generate_known_candidate()
     db.session.add(known_candidate)
     db.session.add_all([Scheme(id=1, name="FLS"), Scheme(id=2, name="SLS")])
