@@ -70,7 +70,7 @@ def update_role():
         "promotable_grades": Grade.new_grades(
             Candidate.query.get(candidate_id).current_grade()
         ),
-        "organisations": Organisation.query.all(),
+        "organisations": Organisation.query.order_by(Organisation.name.asc()),
         "locations": Location.query.all(),
         "professions": Profession.query.all(),
         "role_changes": Promotion.query.all(),
