@@ -21,7 +21,7 @@ def upgrade():
     op.create_table(
         "age_range",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("value", sa.String(length=10), nullable=True),
+        sa.Column("value", sa.String(length=20), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
