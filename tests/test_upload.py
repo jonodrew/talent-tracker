@@ -1,7 +1,8 @@
-from app.models import Candidate
+from app.models import Candidate, Organisation
 import modules.seed as sd
 import pytest
 from datetime import date
+from modules.upload import Row
 
 
 @pytest.mark.parametrize("scheme", ["FLS"])
@@ -10,8 +11,8 @@ class TestUpload:
     def test_create_candidate_data(
         self, year, test_upload_object, detailed_candidate, test_session
     ):
-        sd.clear_old_data()
-        sd.commit_data()
+        test_session.add_all([Organisation(name='SIS'),
+                              Organisation(name='Foreign and Commonwealth Office')])
         u = test_upload_object(
             f"tests/data/{year}/test_csv.csv",
             f"tests/data/{year}/test_application_csv.csv",
@@ -41,8 +42,8 @@ class TestUpload:
     def test_redact_replaces_personal_data_with_redacted(
         self, year, scheme, csv_field, db_field, new_data, test_upload_object
     ):
-        sd.clear_old_data()
-        sd.commit_data()
+        test_session.add_all([Organisation(name='SIS'),
+                              Organisation(name='Foreign and Commonwealth Office')])
         u = test_upload_object(
             f"tests/data/{year}/test_csv.csv",
             f"tests/data/{year}/test_application_csv.csv",
@@ -56,6 +57,8 @@ class TestUpload:
     def test_redact_mixes_up_protected_characteristics(
         self, year, scheme, test_session, detailed_candidate, test_upload_object
     ):
+        test_session.add_all([Organisation(name='SIS'),
+                              Organisation(name='Foreign and Commonwealth Office')])
         u = test_upload_object(
             f"tests/data/{year}/test_csv.csv",
             f"tests/data/{year}/test_application_csv.csv",
@@ -69,3 +72,24 @@ class TestUpload:
         assert candidate.ethnicity.value == "Terran"
         assert candidate.gender.value in ["Fork", "Knife", "Chopsticks"]
         assert candidate.main_job_type.value == "Roboticist"
+
+
+class TestRow:
+    def test_process_organisation_adds_alb_to_parent(self, blank_session):
+        dept = "Foreign and Commonwealth Office"
+        alb = "SIS"
+        blank_session.add_all(
+            [
+                Organisation(id=1, name=alb, arms_length_body=True),
+                Organisation(id=2, name=dept, department=True),
+            ]
+        )
+        Row._process_organisation(dept, alb)
+        assert (
+            Organisation.query.filter_by(name=alb).first().parent_organisation_id == 2
+        )
+
+    def test_process_organisation_falls_back_to_dept_if_no_alb(self, blank_session):
+        blank_session.add(Organisation(name="FCO"))
+        org = Row._process_organisation("FCO", "Not Applicable")
+        assert org.name == "FCO"
