@@ -135,11 +135,20 @@ class Row:
             )
         )
 
+    @staticmethod
+    def time_parser(datetime_string: str):
+        if type(datetime_string) is float:
+            return None
+        if len(datetime_string) > 4:
+            return datetime.strptime(datetime_string[0:10], "%Y-%m-%d")
+        else:
+            return date(int(datetime_string), 1, 1)
+
     def _create_candidate_data(self):
+        print("Processing successful candidate")
+        print(f"Creating candidate PerID {self.data.get('Psych. Username')}")
         c = Candidate(
-            joining_date=datetime.strptime(
-                self.data.get("CS Joining Year"), "%d/%m/%Y"
-            ),
+            joining_date=self.time_parser(self.data.get("CS Joining Year")),
             completed_fast_stream=self._yes_is_true_no_is_false_translator(
                 self.data["Have you completed  Fast Stream?"]
             ),
