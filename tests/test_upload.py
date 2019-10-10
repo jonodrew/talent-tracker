@@ -1,5 +1,4 @@
 from app.models import Candidate, Organisation
-import modules.seed as sd
 import pytest
 from datetime import date
 from modules.upload import Row
@@ -9,10 +8,14 @@ from modules.upload import Row
 @pytest.mark.parametrize("year", ["2019"])
 class TestUpload:
     def test_create_candidate_data(
-        self, year, test_upload_object, detailed_candidate, test_session
+        self, year, scheme, test_upload_object, seed_data, test_session
     ):
-        test_session.add_all([Organisation(name='SIS'),
-                              Organisation(name='Foreign and Commonwealth Office')])
+        test_session.add_all(
+            [
+                Organisation(name="SIS"),
+                Organisation(name="Foreign and Commonwealth Office"),
+            ]
+        )
         u = test_upload_object(
             f"tests/data/{year}/test_csv.csv",
             f"tests/data/{year}/test_application_csv.csv",
@@ -24,7 +27,7 @@ class TestUpload:
         assert candidate
         assert len(candidate.applications.all()) == 1
         assert len(candidate.roles.all()) == 2
-        assert candidate.sexuality_id == 0
+        assert candidate.sexuality.value == "Bisexual"
         assert candidate.current_grade().value == "Grade 6 (or equivalent)"
         assert candidate.roles[0].date_started == date(2019, 1, 1)
         assert (
@@ -40,10 +43,22 @@ class TestUpload:
         ],
     )
     def test_redact_replaces_personal_data_with_redacted(
-        self, year, scheme, csv_field, db_field, new_data, test_upload_object
+        self,
+        year,
+        scheme,
+        csv_field,
+        db_field,
+        new_data,
+        test_upload_object,
+        seed_data,
+        test_session,
     ):
-        test_session.add_all([Organisation(name='SIS'),
-                              Organisation(name='Foreign and Commonwealth Office')])
+        test_session.add_all(
+            [
+                Organisation(name="SIS"),
+                Organisation(name="Foreign and Commonwealth Office"),
+            ]
+        )
         u = test_upload_object(
             f"tests/data/{year}/test_csv.csv",
             f"tests/data/{year}/test_application_csv.csv",
@@ -57,8 +72,12 @@ class TestUpload:
     def test_redact_mixes_up_protected_characteristics(
         self, year, scheme, test_session, detailed_candidate, test_upload_object
     ):
-        test_session.add_all([Organisation(name='SIS'),
-                              Organisation(name='Foreign and Commonwealth Office')])
+        test_session.add_all(
+            [
+                Organisation(name="SIS"),
+                Organisation(name="Foreign and Commonwealth Office"),
+            ]
+        )
         u = test_upload_object(
             f"tests/data/{year}/test_csv.csv",
             f"tests/data/{year}/test_application_csv.csv",

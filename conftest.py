@@ -48,15 +48,18 @@ def blank_session(db):
 
     db.session = session_
 
+    print("Yielding blank session")
     yield session_
 
     transaction.rollback()
     connection.close()
     session_.remove()
+    print("Rolled back blank session")
 
 
 @pytest.fixture(scope="function", autouse=False)
 def test_session(blank_session):
+    print("Setting up test session")
     test_user = User(email="Test User")
     test_user.set_password("Password")
     blank_session.add(test_user)
@@ -79,9 +82,10 @@ def test_session(blank_session):
         ]
     )
     blank_session.add(Candidate(id=1))
-    blank_session.commit()
 
     yield blank_session
+
+    print("Finished test session")
 
 
 @pytest.fixture
@@ -346,15 +350,16 @@ def candidate_in_session(test_client):
 
 
 @pytest.fixture
-def seed_data(test_client):
+def seed_data(test_client, test_session):
     with test_client:
+        print("Seeding with base data")
         clear_old_data()
         commit_data(
             os.path.join(str(os.getcwd()), "tests/data/test-database-content.xlsx")
         )
         yield
-        # clear_old_data()
-
+        print("Rolling back the session")
+        test_session.rollback()
 
 
 @pytest.fixture
@@ -381,4 +386,6 @@ def test_upload_object(test_session):
             redact_personal_data=redacted,
         )
 
-    return _upload_object
+    yield _upload_object
+    test_session.rollback()
+    print("Finished with upload object")
