@@ -2,7 +2,12 @@
     <div class="govuk-accordion__section-header">
         <h2 class="govuk-accordion__section-heading">
             <span class="govuk-accordion__section-button" id="accordion-default-heading-2">
-              {{ role.role_name }}
+                {% if first %}
+                    Current role:
+                {% elif last %}
+                    First role:
+                {% endif %}
+            {{ role.role_name }}
             </span>
         </h2>
     </div>
