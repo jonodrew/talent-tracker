@@ -25,10 +25,7 @@ class Upload:
         self.row_reader = RedactedRow if redact_personal_data else Row
 
     def complete_upload(self):
-        for i in range(len(self.joined_dataframe.index)):
-            row_series = self.joined_dataframe.iloc[i]
-            row = self.row_reader(row_series, self.scheme_start_date, self.scheme)
-            db.session.add(row.get_candidate())
+        self.joined_dataframe.apply(self.process_row, axis=1)
         db.session.commit()
 
     def join_csvs(self):
@@ -41,6 +38,11 @@ class Upload:
             suffixes=("_intake", "_application"),
         )
         return df[df.Status == "Successful"]
+
+    def process_row(self, row_series):
+        row = self.row_reader(row_series, self.scheme_start_date, self.scheme)
+        db.session.add(row.get_candidate())
+        return None
 
 
 class Row:
