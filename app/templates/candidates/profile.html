@@ -33,7 +33,10 @@
         </div>
       </div>
         {% for role in candidate.roles %}
-            {% include 'partials/accordion-section-role.html' %}
+            {% with first=loop.first, last=loop.last %}
+                {% include 'partials/accordion-section-role.html' %}
+            {% endwith %}
+
         {% endfor %}
     </div>
 
