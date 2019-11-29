@@ -2,6 +2,8 @@ from app import create_app
 from app.models import Role, User, Candidate, Organisation, db
 import click
 from modules.seed import commit_data
+import modules.seed as sd
+import modules.upload as ud
 
 app = create_app()
 
@@ -14,6 +16,8 @@ def make_shell_context():
         "Role": Role,
         "Candidate": Candidate,
         "Organisation": Organisation,
+        "ud": ud,
+        "sd": sd,
     }
 
 
