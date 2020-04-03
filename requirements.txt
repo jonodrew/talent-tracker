@@ -65,4 +65,4 @@ virtualenv==16.7.9
 wcwidth==0.1.9
 Werkzeug==1.0.1
 xlrd==1.2.0
-zipp==0.6.0
+zipp==3.1.0
