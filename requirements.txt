@@ -62,7 +62,7 @@ traceback2==1.4.0
 unittest2==1.1.0
 urllib3==1.25.7
 virtualenv==16.7.9
-wcwidth==0.1.7
+wcwidth==0.1.9
 Werkzeug==1.0.1
 xlrd==1.2.0
 zipp==0.6.0
