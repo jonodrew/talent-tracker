@@ -1,5 +1,6 @@
 import pytest
 from flask import url_for, session
+from datetime import date
 
 from app.models import (
     Grade,
@@ -9,6 +10,7 @@ from app.models import (
     Role,
     AuditEvent,
     Promotion,
+    RoleChangeEvent,
 )
 from flask_login import current_user
 
@@ -209,6 +211,11 @@ def test_check_details(
     assert "Senior dev" == latest_role.role_name
     assert "substantive promotion" == latest_role.role_change.value
     assert "changed_address@gov.uk" == test_candidate.email_address
+
+    assert len(RoleChangeEvent.query.all()) == 1
+    role_change_event: RoleChangeEvent = RoleChangeEvent.query.first()
+    assert role_change_event.new_role_id == latest_role.id
+    assert role_change_event.role_change_date == date(2019, 1, 1)
 
 
 class TestAuthentication:
