@@ -40,7 +40,6 @@ pandas==0.25.1
 parse==1.12.1
 parse-type==0.5.2
 pbr==5.4.3
-pkg-resources==0.0.0
 pluggy==0.13.0
 pre-commit==1.18.3
 psycopg2==2.8.3
