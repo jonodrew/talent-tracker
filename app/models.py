@@ -391,3 +391,12 @@ class AuditEvent(db.Model):
 class Promotion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.String(28), index=True)
+
+
+class RoleChangeEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    candidate_id = db.Column(db.ForeignKey("candidate.id"))
+    former_role_id = db.Column(db.ForeignKey("role.id"))
+    new_role_id = db.Column(db.ForeignKey("role.id"))
+    role_change_id = db.Column(db.ForeignKey("promotion.id"))
