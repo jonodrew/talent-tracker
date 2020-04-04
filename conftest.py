@@ -36,6 +36,7 @@ def db(test_client):
     yield _db
 
     _db.drop_all()
+    os.remove("/home/jonathan/projects/talent-tracker/app/testing-database")
 
 
 @pytest.fixture(scope="function", autouse=True)
