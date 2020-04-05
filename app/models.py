@@ -88,7 +88,9 @@ class Candidate(db.Model):
         order_by="Application.scheme_start_date.desc()",
     )
     joining_grade = db.relationship("Grade", backref="candidate")
-    role_changes = db.relationship("RoleChangeEvent", backref="candidate")
+    role_changes = db.relationship(
+        "RoleChangeEvent", backref="candidate", lazy="dynamic"
+    )
 
     def __repr__(self):
         return f"<Candidate email {self.email_address}>"
@@ -96,40 +98,36 @@ class Candidate(db.Model):
     def current_grade(self) -> "Grade":
         return self.roles.order_by(Role.date_started.desc()).first().grade
 
-    def promoted(
+    def promoted_between(
         self,
         promoted_after_date: datetime.date,
-        promoted_before_date=None,
+        promoted_before_date: [datetime.date, None] = None,
         temporary=False,
-    ):
+    ) -> bool:
         """
-        Returns whether this candidate was promoted after the passed date. Promotions are only considered if they're
-        substantive. There is a flag is users want to see temporary promotions instead
+        Returns whether this candidate was promoted between the passed dates. By default, promotions are only considered if they're substantive. There is a
+        flag if users want to see temporary promotions instead
+        :param promoted_before_date:
         :param promoted_after_date:
-        :type promoted_after_date:
         :param temporary: Whether the user wants temporary or substantive promotions
         :type temporary: bool
-        :return:
-        :rtype:
+        :return: whether the candidate was promoted
         """
-        if temporary:
-            role_change = Promotion.query.filter(
-                Promotion.value.like("%temporary%")
-            ).first()
-        else:
-            role_change = Promotion.query.filter(
-                Promotion.value.like("%substantive%")
-            ).first()
         if not promoted_before_date:
             promoted_before_date = datetime.today()
-        roles_after_date = self.roles.filter(
+        role_change = (
+            Promotion.query.filter(Promotion.value == "temporary").first()
+            if temporary
+            else Promotion.query.filter(Promotion.value == "substantive").first()
+        )
+        role_changes = self.role_changes.filter(
             and_(
-                Role.date_started >= promoted_after_date,
-                Role.date_started <= promoted_before_date,
-                Role.role_change == role_change,
+                RoleChangeEvent.role_change_id == role_change.id,
+                RoleChangeEvent.role_change_date <= promoted_before_date,
+                RoleChangeEvent.role_change_date >= promoted_after_date,
             )
         ).all()
-        return len(roles_after_date) > 0
+        return len(role_changes) > 0
 
     def current_scheme(self) -> "Scheme":
         return Scheme.query.get(

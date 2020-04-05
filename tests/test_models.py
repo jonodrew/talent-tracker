@@ -129,7 +129,8 @@ class TestCandidate:
             role_change_id=role_change.id,
         )
         assert (
-            test_candidate.promoted("2019-09-01", date(2020, 1, 1)) is expected_outcome
+            test_candidate.promoted_between("2019-09-01", date(2020, 1, 1))
+            is expected_outcome
         )
 
     def test_current_scheme_returns_current_scheme(self, test_candidate_applied_to_fls):
