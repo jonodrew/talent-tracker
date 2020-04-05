@@ -90,9 +90,7 @@ class Candidate(db.Model):
     main_job_type_id = db.Column(db.ForeignKey("main_job_type.id"))
     joining_grade_id = db.Column(db.ForeignKey("grade.id"))
 
-    roles = db.relationship(
-        "Role", backref="candidate", lazy="dynamic", order_by="Role.date_started.desc()"
-    )
+    roles = db.relationship("Role", backref="candidate", lazy="dynamic")
     applications = db.relationship(
         "Application",
         backref="candidate",
@@ -101,7 +99,10 @@ class Candidate(db.Model):
     )
     joining_grade = db.relationship("Grade", backref="candidate")
     role_changes = db.relationship(
-        "RoleChangeEvent", backref="candidate", lazy="dynamic"
+        "RoleChangeEvent",
+        backref="candidate",
+        lazy="dynamic",
+        order_by="RoleChangeEvent.role_change_date.desc()",
     )
 
     def __repr__(self):
@@ -295,13 +296,20 @@ class Role(db.Model):
     role_change = db.relationship("Promotion", lazy="select")
 
     def __repr__(self):
-        return f"<Role held by {self.candidate} at {self.organisation_id}>"
+        return (
+            f"<Role '{self.role_name}' held by {self.candidate} at {self.organisation}>"
+        )
 
     def is_promotion(self):
-        role_before_this = (
-            self.candidate.roles.order_by(Role.date_started.desc()).limit(2).all()[1]
-        )
+        role_before_this = Role.query.get(self.candidate.role_changes[1].former_role_id)
         return self.grade.rank < role_before_this.grade.rank
+
+    def date_started(self):
+        return (
+            RoleChangeEvent.query.filter_by(new_role_id=self.id)
+            .first()
+            .role_change_date
+        )
 
 
 class Scheme(db.Model):
