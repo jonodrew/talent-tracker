@@ -212,8 +212,11 @@ def test_check_details(
     assert "substantive" == latest_role.role_change.value
     assert "changed_address@gov.uk" == test_candidate.email_address
 
-    assert len(RoleChangeEvent.query.all()) == 1
-    role_change_event: RoleChangeEvent = RoleChangeEvent.query.first()
+    assert len(RoleChangeEvent.query.all()) == 2
+    # One RoleChangeEvent when candidate joined, and another when this data is POSTed
+    role_change_event: RoleChangeEvent = RoleChangeEvent.query.order_by(
+        RoleChangeEvent.id.desc()
+    ).first()
     assert role_change_event.new_role_id == latest_role.id
     assert role_change_event.role_change_date == date(2019, 1, 1)
 

@@ -179,12 +179,13 @@ class Candidate(db.Model):
         self.role_changes.append(
             RoleChangeEvent(
                 candidate_id=self.id,
-                former_role_id=self.roles[1].id,
+                former_role_id=self.roles[1].id if len(self.roles.all()) > 1 else None,
                 new_role_id=self.roles[0].id,
                 role_change_id=role_change_id,
                 role_change_date=start_date,
             )
         )
+        db.session.commit()
 
 
 class Organisation(db.Model):

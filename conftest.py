@@ -91,7 +91,7 @@ def test_session(blank_session):
 
 @pytest.fixture
 def test_candidate(test_session):
-    candidate = Candidate.query.get(1)
+    candidate: Candidate = Candidate.query.get(1)
     candidate.email_address = "test.candidate@numberten.gov.uk"
     candidate.secondary_email_address = "test.secondary@gov.uk"
     candidate.first_name = "Testy"
@@ -105,8 +105,14 @@ def test_candidate(test_session):
     candidate.belief_id = 1
     candidate.sexuality_id = 1
 
-    candidate.roles.append(
-        Role(date_started=date(2010, 5, 1), grade_id=2, location_id=1, role_change_id=2)
+    candidate.new_role(
+        start_date=date(2010, 5, 1),
+        new_org_id=1,
+        new_profession_id=1,
+        new_location_id=1,
+        new_grade_id=2,
+        new_title="Snr Test Candidate",
+        role_change_id=2,
     )
     test_data = {
         "grades": [
@@ -147,15 +153,18 @@ def test_candidate_applied_and_promoted(test_candidate_applied_to_fls, test_sess
 
 
 @pytest.fixture
-def test_roles(test_session, test_candidate):
-    roles = [
-        Role(
-            date_started=date(2019, 1, 1),
-            candidate_id=test_candidate.id,
-            grade_id=Grade.query.filter(Grade.value == "Band A").first().id,
-        )
-    ]
-    test_session.add_all(roles)
+def test_roles(test_session, test_candidate: Candidate):
+    test_candidate.new_role(
+        start_date=date(2019, 1, 1),
+        new_org_id=1,
+        new_profession_id=1,
+        new_location_id=1,
+        new_grade_id=Grade.query.filter(Grade.value == "Band A").first().id,
+        new_title="Test Role",
+        role_change_id=Promotion.query.filter(Promotion.value == "substantive")
+        .first()
+        .id,
+    )
     test_session.commit()
     yield
 
@@ -248,7 +257,6 @@ def candidates_promoter():
         for candidate in candidates_to_promote[
             0 : int(len(candidates_to_promote) * decimal_ratio)
         ]:
-            candidate.roles.append(Role(date_started=date(2018, 1, 1)))
             candidate: Candidate
             candidate.new_role(
                 start_date=date(2019, 3, 1),
@@ -282,7 +290,7 @@ def scheme_appender(test_session):
 
 
 @pytest.fixture
-def detailed_candidate(test_candidate, test_session):
+def detailed_candidate(test_candidate: Candidate, test_session):
     test_candidate: Candidate
     test_session.add(Organisation(id=1, name="Department of Fun"))
     test_session.add(Location(id=2, value="Stargate-1"))
@@ -322,18 +330,14 @@ def detailed_candidate(test_candidate, test_session):
             scheme_id=1,
         )
     )
-    test_candidate.roles.extend(
-        [
-            Role(date_started=date(2018, 6, 1)),
-            Role(
-                date_started=date(2019, 1, 1),
-                role_change_id=1,
-                role_name="Director of Happiness",
-                grade_id=5,
-                location_id=2,
-                organisation_id=1,
-            ),
-        ]
+    test_candidate.new_role(
+        start_date=date(2019, 6, 1),
+        new_org_id=1,
+        new_profession_id=1,
+        new_location_id=2,
+        new_grade_id=5,
+        new_title="Director of Happiness",
+        role_change_id=1,
     )
 
 
