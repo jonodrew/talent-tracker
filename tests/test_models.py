@@ -184,20 +184,24 @@ class TestRole:
         role_change_id,
         expected_outcome,
         test_session,
-        test_candidate,
+        test_candidate: Candidate,
     ):
-        test_candidate.roles.extend(
-            [
-                Role(
-                    date_started=date(2019, 1, 1),
-                    grade=Grade.query.filter_by(value=starting_grade).first(),
-                    role_change_id=2,
-                ),
-                Role(
-                    date_started=date(2020, 6, 1),
-                    grade=Grade.query.filter_by(value=new_grade).first(),
-                    role_change_id=role_change_id,
-                ),
-            ]
+        test_candidate.new_role(
+            start_date=date(2019, 1, 1),
+            new_org_id=1,
+            new_profession_id=1,
+            new_location_id=1,
+            new_grade_id=Grade.query.filter_by(value=starting_grade).first().id,
+            new_title="Old job",
+            role_change_id=2,
         )
-        assert test_candidate.roles[0].is_promotion() is expected_outcome
+        test_candidate.new_role(
+            start_date=date(2020, 6, 1),
+            new_org_id=1,
+            new_profession_id=1,
+            new_location_id=1,
+            new_grade_id=Grade.query.filter_by(value=new_grade).first().id,
+            new_title="New job",
+            role_change_id=role_change_id,
+        )
+        assert test_candidate.current_role().is_promotion() is expected_outcome

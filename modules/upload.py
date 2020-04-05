@@ -85,22 +85,22 @@ class Row:
         return "Not provided" if title == "" else title
 
     def _add_most_recent_role(self):
-        self.candidate.roles.append(
-            Role(
-                role_name=self._get_title_or_not_provided(),
-                organisation=self._process_organisation(
-                    self.data.Department_intake, self.data.ALB
-                ),
-                profession=Profession.query.filter_by(
-                    value=self.data.Profession_intake
-                ).first(),
-                grade=self._grade_processor(self.data.get("Current Grade")),
-                location=Location.query.filter_by(
-                    value=self.data.Location_intake
-                ).first(),
-                role_change=Promotion.query.filter_by(value="substantive").first(),
-                date_started=date(self.scheme_start_date.year - 1, 1, 1),
+        self.candidate.new_role(
+            start_date=date(self.scheme_start_date.year - 1, 1, 1),
+            new_org_id=self._process_organisation(
+                self.data.Department_intake, self.data.ALB
+            ).id,
+            new_profession_id=Profession.query.filter_by(
+                value=self.data.Profession_intake
             )
+            .first()
+            .id,
+            new_location_id=Location.query.filter_by(value=self.data.Location_intake)
+            .first()
+            .id,
+            new_grade_id=self._grade_processor(self.data.get("Current Grade")).id,
+            new_title=self._get_title_or_not_provided(),
+            role_change_id=Promotion.query.filter_by(value="substantive").first().id,
         )
 
     @staticmethod
@@ -128,13 +128,14 @@ class Row:
         )
 
     def _add_first_role(self):
-        self.candidate.roles.append(
-            Role(
-                date_started=self.candidate.joining_date,
-                role_name="Not given",
-                grade=self.candidate.joining_grade,
-                role_change=Promotion.query.filter_by(value="substantive").first(),
-            )
+        self.candidate.new_role(
+            start_date=self.candidate.joining_date,
+            new_org_id=None,
+            new_profession_id=None,
+            new_location_id=None,
+            new_grade_id=self.candidate.joining_grade.id,
+            new_title="Not given",
+            role_change_id=Promotion.query.filter_by(value="substantive").first().id,
         )
 
     @staticmethod
@@ -147,8 +148,6 @@ class Row:
             return date(int(datetime_string), 1, 1)
 
     def _create_candidate_data(self):
-        print("Processing successful candidate")
-        print(f"Creating candidate PerID {self.data.get('Psych. Username')}")
         c = Candidate(
             joining_date=self.time_parser(self.data.get("CS Joining Year")),
             completed_fast_stream=self._yes_is_true_no_is_false_translator(
