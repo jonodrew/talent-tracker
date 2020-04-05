@@ -75,7 +75,9 @@ class PromotionReport(Report, ABC):
         return [
             candidate
             for candidate in candidates
-            if candidate.promoted(self.promotions_count_from, temporary=temporary)
+            if candidate.promoted_between(
+                self.promotions_count_from, temporary=temporary
+            )
         ]
 
     def write_row(self, row_data, data_object, csv_writer):

@@ -49,7 +49,7 @@ class TestCandidate:
                     {
                         "date-started": date(2019, 12, 1),
                         "grade-value": "Grade 6",
-                        "role-change": "substantive promotion",
+                        "role-change": "substantive",
                     },
                 ],
                 True,
@@ -60,7 +60,7 @@ class TestCandidate:
                     {
                         "date-started": date(2019, 12, 1),
                         "grade-value": "Grade 6",
-                        "role-change": "temporary promotion",
+                        "role-change": "temporary",
                     },
                 ],
                 False,
@@ -82,7 +82,7 @@ class TestCandidate:
                     {
                         "date-started": date(2020, 3, 1),
                         "grade-value": "Grade 6",
-                        "role-change": "substantive promotion",
+                        "role-change": "substantive",
                     },
                 ],
                 False,
@@ -107,25 +107,30 @@ class TestCandidate:
             value=list_of_role_data[1].get("role-change")
         ).first()
         test_candidate: Candidate
-        test_candidate.roles.extend(
-            [
-                Role(
-                    date_started=list_of_role_data[0].get("date-started"),
-                    grade=Grade.query.filter_by(
-                        value=list_of_role_data[0].get("grade-value")
-                    ).first(),
-                ),
-                Role(
-                    date_started=list_of_role_data[1].get("date-started"),
-                    grade=Grade.query.filter_by(
-                        value=list_of_role_data[1].get("grade-value")
-                    ).first(),
-                    role_change=role_change,
-                ),
-            ]
+        test_candidate.roles.append(
+            Role(
+                date_started=list_of_role_data[0].get("date-started"),
+                grade=Grade.query.filter_by(
+                    value=list_of_role_data[0].get("grade-value")
+                ).first(),
+            )
+        )
+        test_candidate.new_role(
+            start_date=list_of_role_data[1].get("date-started"),
+            new_org_id=1,
+            new_profession_id=1,
+            new_location_id=1,
+            new_grade_id=Grade.query.filter_by(
+                value=list_of_role_data[1].get("grade-value")
+            )
+            .first()
+            .id,
+            new_title="New title",
+            role_change_id=role_change.id,
         )
         assert (
-            test_candidate.promoted("2019-09-01", date(2020, 1, 1)) is expected_outcome
+            test_candidate.promoted_between("2019-09-01", date(2020, 1, 1))
+            is expected_outcome
         )
 
     def test_current_scheme_returns_current_scheme(self, test_candidate_applied_to_fls):
