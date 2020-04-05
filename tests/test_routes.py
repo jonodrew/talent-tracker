@@ -209,7 +209,6 @@ def test_check_details(
     latest_role: Role = test_candidate.current_role()
     assert "Organisation 1" == Organisation.query.get(latest_role.organisation_id).name
     assert "Senior dev" == latest_role.role_name
-    assert "substantive" == latest_role.role_change.value
     assert "changed_address@gov.uk" == test_candidate.email_address
 
     assert len(RoleChangeEvent.query.all()) == 2
@@ -219,6 +218,7 @@ def test_check_details(
     ).first()
     assert role_change_event.new_role_id == latest_role.id
     assert role_change_event.role_change_date == date(2019, 1, 1)
+    assert role_change_event.role_change.value == "substantive"
 
 
 class TestAuthentication:

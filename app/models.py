@@ -158,8 +158,10 @@ class Candidate(db.Model):
     def current_location(self):
         return self.current_role().location.value
 
-    def roles_since_date(self, since_date: datetime.date):
-        return [role for role in self.roles if role.date_started >= since_date]
+    def role_change_events_since_date(self, since_date: datetime.date):
+        return self.role_changes.filter(
+            RoleChangeEvent.role_change_date >= since_date
+        ).all()
 
     def update_email(self, new_address: str, primary: bool):
         if primary:
