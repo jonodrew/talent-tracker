@@ -177,27 +177,25 @@ class Candidate(db.Model):
         new_title,
         role_change_id,
     ):
-        self.roles.append(
-            Role(
-                date_started=start_date,
-                organisation_id=new_org_id,
-                profession_id=new_profession_id,
-                location_id=new_location_id,
-                grade_id=new_grade_id,
-                role_name=new_title,
-                role_change_id=role_change_id,
-            )
+        new_role = Role(
+            organisation_id=new_org_id,
+            profession_id=new_profession_id,
+            location_id=new_location_id,
+            grade_id=new_grade_id,
+            role_name=new_title,
         )
+        self.roles.append(new_role)
         self.role_changes.append(
             RoleChangeEvent(
                 candidate_id=self.id,
-                former_role_id=self.roles[1].id if len(self.roles.all()) > 1 else None,
-                new_role_id=self.roles[0].id,
+                former_role_id=None
+                if self.current_role() is None
+                else self.current_role().id,
+                new_role_id=new_role.id,
                 role_change_id=role_change_id,
                 role_change_date=start_date,
             )
         )
-        db.session.commit()
 
 
 class Organisation(db.Model):
