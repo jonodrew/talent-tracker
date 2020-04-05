@@ -311,6 +311,9 @@ class Role(db.Model):
             .role_change_date
         )
 
+    def last_role_change(self):
+        return RoleChangeEvent.query.filter_by(new_role_id=self.id).first()
+
 
 class Scheme(db.Model):
     id = db.Column(db.Integer(), primary_key=True)

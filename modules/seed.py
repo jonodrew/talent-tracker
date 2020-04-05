@@ -12,7 +12,7 @@ def random_string(length: int) -> str:
 
 
 def generate_known_candidate():
-    return Candidate(
+    c = Candidate(
         email_address="staging.candidate@gov.uk",
         secondary_email_address="staging.secondary@gov.uk",
         joining_date=date(2015, 9, 1),
@@ -26,24 +26,6 @@ def generate_known_candidate():
         belief=Belief.query.filter_by(value="No Religion").first(),
         gender=Gender.query.filter_by(value="Prefer not to say").first(),
         sexuality=Sexuality.query.filter_by(value="Bisexual").first(),
-        roles=[
-            Role(
-                date_started=date(2015, 9, 2),
-                profession_id=Profession.query.filter_by(
-                    value="Digital, data & technology"
-                )
-                .first()
-                .id,
-                role_change_id=2,
-                organisation_id=Organisation.query.filter(
-                    Organisation.name == "Cabinet Office"
-                )
-                .first()
-                .id,
-                grade=Grade.query.filter(Grade.value.like("%Faststream%")).first(),
-                location=Location.query.filter_by(value="London").first(),
-            )
-        ],
         applications=[
             Application(
                 scheme_id=Scheme.query.filter_by(name="FLS").first().id,
@@ -51,10 +33,24 @@ def generate_known_candidate():
             )
         ],
     )
+    c.new_role(
+        start_date=date(2015, 9, 2),
+        new_org_id=Organisation.query.filter(Organisation.name == "Cabinet Office")
+        .first()
+        .id,
+        new_profession_id=Profession.query.filter_by(value="Digital, data & technology")
+        .first()
+        .id,
+        new_location_id=Location.query.filter_by(value="London").first().id,
+        new_grade_id=Grade.query.filter(Grade.value.like("%Faststream%")).first().id,
+        new_title="Known role",
+        role_change_id=2,
+    )
+    return c
 
 
 def generate_random_candidate():
-    return Candidate(
+    c = Candidate(
         email_address=f"{random_string(16)}@gov.uk",
         first_name=f"{random_string(8)}",
         last_name=f"{random_string(12)}",
@@ -73,17 +69,18 @@ def generate_random_candidate():
         belief=random.choice(Belief.query.all()),
         sexuality=random.choice(Sexuality.query.all()),
         working_pattern=random.choice(WorkingPattern.query.all()),
-        roles=[
-            Role(
-                date_started=date(2015, 9, 2),
-                organisation_id=random.choice(Organisation.query.all()).id,
-                grade=Grade.query.filter(Grade.value.like("%Faststream%")).first(),
-                location=random.choice(Location.query.all()),
-                role_change_id=2,
-            )
-        ],
         main_job_type=MainJobType.query.first(),
     )
+    c.new_role(
+        start_date=date(2015, 9, 2),
+        new_org_id=random.choice(Organisation.query.all()).id,
+        new_profession_id=random.choice(Profession.query.all()).id,
+        new_location_id=random.choice(Location.query.all()).id,
+        new_grade_id=Grade.query.filter(Grade.value.like("%Faststream%")).first().id,
+        new_title=f"Random role {random_string(10)}",
+        role_change_id=2,
+    )
+    return c
 
 
 def apply_candidate_to_scheme(
@@ -108,33 +105,27 @@ def apply_candidate_to_scheme(
 def promote_candidate(candidate: Candidate, role_change_type=None):
     if role_change_type is None:
         role_change_type = random.choice(["substantive", "temporary", "level transfer"])
-    candidate.roles.extend(
-        [
-            Role(
-                date_started=date(2018, 1, 1),
-                role_change=Promotion.query.filter(
-                    Promotion.value == "substantive"
-                ).first(),
-                organisation=Organisation.query.filter_by(
-                    name="Cabinet Office"
-                ).first(),
-                location=Location.query.filter_by(value="London").first(),
-                role_name="First role",
-                grade=Grade.query.filter_by(rank=5).first(),
-            ),
-            Role(
-                date_started=date(2019, 6, 1),
-                role_change=Promotion.query.filter(
-                    Promotion.value == f"{role_change_type}"
-                ).first(),
-                organisation=Organisation.query.filter_by(
-                    name="Cabinet Office"
-                ).first(),
-                location=Location.query.filter_by(value="London").first(),
-                role_name="Second role",
-                grade=Grade.query.filter_by(rank=4).first(),
-            ),
-        ]
+    candidate.new_role(
+        start_date=date(2018, 1, 1),
+        new_org_id=Organisation.query.filter_by(name="Cabinet Office").first().id,
+        new_profession_id=1,
+        new_location_id=Location.query.filter_by(value="London").first().id,
+        new_grade_id=Grade.query.filter_by(rank=5).first().id,
+        new_title="First role",
+        role_change_id=Promotion.query.filter(Promotion.value == "substantive")
+        .first()
+        .id,
+    )
+    candidate.new_role(
+        start_date=date(2019, 6, 1),
+        new_org_id=Organisation.query.filter_by(name="Cabinet Office").first().id,
+        new_profession_id=1,
+        new_location_id=Location.query.filter_by(value="London").first().id,
+        new_grade_id=Grade.query.filter_by(rank=4).first().id,
+        new_title="Second role",
+        role_change_id=Promotion.query.filter(Promotion.value == f"{role_change_type}")
+        .first()
+        .id,
     )
     return candidate
 
