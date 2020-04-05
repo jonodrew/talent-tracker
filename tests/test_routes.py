@@ -206,7 +206,7 @@ def test_check_details(
         }
         sess["candidate-id"] = test_candidate.id
     test_client.post("/update/check-your-answers")
-    latest_role: Role = test_candidate.roles.order_by(Role.id.desc()).first()
+    latest_role: Role = test_candidate.current_role()
     assert "Organisation 1" == Organisation.query.get(latest_role.organisation_id).name
     assert "Senior dev" == latest_role.role_name
     assert "substantive" == latest_role.role_change.value

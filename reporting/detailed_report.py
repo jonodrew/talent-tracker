@@ -51,7 +51,7 @@ class DetailedReport(Report):
 
     def row_writer(self, candidate: Candidate) -> List:
         application = candidate.most_recent_application()
-        current_role: Role = candidate.roles[0]
+        current_role: Role = candidate.current_role()
         return [
             f"{candidate.first_name} {candidate.last_name}",
             candidate.email_address,

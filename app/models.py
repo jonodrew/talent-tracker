@@ -108,7 +108,7 @@ class Candidate(db.Model):
         return f"<Candidate email {self.email_address}>"
 
     def current_grade(self) -> "Grade":
-        return self.roles.order_by(Role.date_started.desc()).first().grade
+        return self.current_role().grade
 
     def promoted_between(
         self,
@@ -156,7 +156,7 @@ class Candidate(db.Model):
         )
 
     def current_location(self):
-        return self.roles.order_by(Role.id.desc()).first().location.value
+        return self.current_role().location.value
 
     def roles_since_date(self, since_date: datetime.date):
         return [role for role in self.roles if role.date_started >= since_date]

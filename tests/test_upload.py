@@ -36,7 +36,7 @@ class TestUpload:
         assert len(candidate.roles.all()) == 2
         assert candidate.sexuality.value == "Bisexual"
         assert candidate.current_grade().value == "Grade 6 (or equivalent)"
-        assert candidate.roles[0].date_started == date(2019, 1, 1)
+        assert candidate.current_role().date_started() == date(2019, 1, 1)
         assert (
             candidate.most_recent_application().aspirational_grade.value
             == "SCS2 – Director"
