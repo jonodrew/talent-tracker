@@ -88,6 +88,7 @@ class Candidate(db.Model):
         order_by="Application.scheme_start_date.desc()",
     )
     joining_grade = db.relationship("Grade", backref="candidate")
+    role_changes = db.relationship("RoleChangeEvent", backref="candidate")
 
     def __repr__(self):
         return f"<Candidate email {self.email_address}>"
@@ -175,6 +176,15 @@ class Candidate(db.Model):
                 grade_id=new_grade_id,
                 role_name=new_title,
                 role_change_id=role_change_id,
+            )
+        )
+        self.role_changes.append(
+            RoleChangeEvent(
+                candidate_id=self.id,
+                former_role_id=self.roles[1].id,
+                new_role_id=self.roles[0].id,
+                role_change_id=role_change_id,
+                role_change_date=start_date,
             )
         )
 
