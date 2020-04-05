@@ -68,8 +68,8 @@ def test_session(blank_session):
     blank_session.add_all([Scheme(id=1, name="FLS"), Scheme(id=2, name="SLS")])
     blank_session.add_all(
         [
-            Promotion(id=1, value="substantive promotion"),
-            Promotion(id=2, value="temporary promotion"),
+            Promotion(id=1, value="temporary"),
+            Promotion(id=2, value="substantive"),
             Promotion(id=3, value="level transfer"),
             Promotion(id=4, value="demotion"),
         ]
@@ -240,12 +240,10 @@ def disability_with_without_no_answer(test_session):
 def candidates_promoter():
     def _promoter(candidates_to_promote, decimal_ratio, temporary=False):
         if temporary:
-            change_type = Promotion.query.filter(
-                Promotion.value == "temporary promotion"
-            ).first()
+            change_type = Promotion.query.filter(Promotion.value == "temporary").first()
         else:
             change_type = Promotion.query.filter(
-                Promotion.value == "substantive promotion"
+                Promotion.value == "substantive"
             ).first()
         for candidate in candidates_to_promote[
             0 : int(len(candidates_to_promote) * decimal_ratio)

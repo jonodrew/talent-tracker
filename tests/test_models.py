@@ -49,7 +49,7 @@ class TestCandidate:
                     {
                         "date-started": date(2019, 12, 1),
                         "grade-value": "Grade 6",
-                        "role-change": "substantive promotion",
+                        "role-change": "substantive",
                     },
                 ],
                 True,
@@ -60,7 +60,7 @@ class TestCandidate:
                     {
                         "date-started": date(2019, 12, 1),
                         "grade-value": "Grade 6",
-                        "role-change": "temporary promotion",
+                        "role-change": "temporary",
                     },
                 ],
                 False,
@@ -82,7 +82,7 @@ class TestCandidate:
                     {
                         "date-started": date(2020, 3, 1),
                         "grade-value": "Grade 6",
-                        "role-change": "substantive promotion",
+                        "role-change": "substantive",
                     },
                 ],
                 False,

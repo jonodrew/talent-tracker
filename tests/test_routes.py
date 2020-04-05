@@ -186,7 +186,7 @@ def test_check_details(
     new_org = Organisation.query.first()
     new_profession = Profession.query.first()
     new_location = Location.query.first()
-    role_change = Promotion.query.first()
+    role_change = Promotion.query.filter_by(value="substantive").first()
     with test_client.session_transaction() as sess:
         sess["update-data"] = {}
         sess["update-data"]["new-role"] = {
@@ -209,7 +209,7 @@ def test_check_details(
     latest_role: Role = test_candidate.roles.order_by(Role.id.desc()).first()
     assert "Organisation 1" == Organisation.query.get(latest_role.organisation_id).name
     assert "Senior dev" == latest_role.role_name
-    assert "substantive promotion" == latest_role.role_change.value
+    assert "substantive" == latest_role.role_change.value
     assert "changed_address@gov.uk" == test_candidate.email_address
 
     assert len(RoleChangeEvent.query.all()) == 1
