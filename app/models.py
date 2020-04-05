@@ -395,6 +395,7 @@ class Promotion(db.Model):
 
 class RoleChangeEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    role_change_date = db.Column(db.Date())
 
     candidate_id = db.Column(db.ForeignKey("candidate.id"))
     former_role_id = db.Column(db.ForeignKey("role.id"))
