@@ -280,7 +280,6 @@ class Location(db.Model):
 
 class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date_started = db.Column(db.Date())
     role_name = db.Column(db.String(256))
 
     organisation_id = db.Column(db.ForeignKey("organisation.id"))
@@ -288,12 +287,10 @@ class Role(db.Model):
     profession_id = db.Column(db.ForeignKey("profession.id"))
     location_id = db.Column(db.ForeignKey("location.id"))
     grade_id = db.Column(db.ForeignKey("grade.id"))
-    role_change_id = db.Column(db.ForeignKey("promotion.id"))
 
     grade = db.relationship("Grade", lazy="select")
     location = db.relationship("Location", lazy="select")
     profession = db.relationship("Profession", lazy="select")
-    role_change = db.relationship("Promotion", lazy="select")
 
     def __repr__(self):
         return (
