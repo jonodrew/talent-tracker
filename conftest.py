@@ -248,11 +248,16 @@ def candidates_promoter():
         for candidate in candidates_to_promote[
             0 : int(len(candidates_to_promote) * decimal_ratio)
         ]:
-            candidate.roles.extend(
-                [
-                    Role(date_started=date(2018, 1, 1)),
-                    Role(date_started=date(2019, 3, 1), role_change=change_type),
-                ]
+            candidate.roles.append(Role(date_started=date(2018, 1, 1)))
+            candidate: Candidate
+            candidate.new_role(
+                start_date=date(2019, 3, 1),
+                new_org_id=1,
+                new_profession_id=1,
+                new_location_id=1,
+                new_grade_id=1,
+                new_title="New title",
+                role_change_id=change_type.id,
             )
         return candidates_to_promote
 
