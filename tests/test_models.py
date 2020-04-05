@@ -28,17 +28,8 @@ def test_fls_questions_create_leadership_record(test_session):
 
 class TestCandidate:
     def test_current_grade_returns_correct_grade(self, test_candidate, test_session):
-        grades = Grade.query.order_by(Grade.rank.asc()).all()
-        roles = [
-            Role(date_started=date(2017 + i, 1, 1), grade=grades[i]) for i in range(3)
-        ]
-        test_candidate.roles.extend(roles)
-        test_session.add(test_candidate)
-        test_session.commit()
-        assert (
-            Candidate.query.get(test_candidate.id).current_grade().value
-            == "Deputy Director (SCS1)"
-        )
+
+        assert Candidate.query.get(test_candidate.id).current_grade().value == "Grade 7"
 
     @pytest.mark.parametrize(
         "list_of_role_data, expected_outcome",
@@ -139,7 +130,7 @@ class TestCandidate:
     @pytest.mark.parametrize(
         "prior_application, expected_output",
         [
-            (Application(application_date=date(2018, 6, 1)), date(2019, 6, 1)),
+            (Application(application_date=date(2017, 6, 1)), date(2018, 6, 1)),
             (Application(application_date=date(2020, 6, 1)), date(2020, 6, 1)),
         ],
     )
@@ -193,20 +184,24 @@ class TestRole:
         role_change_id,
         expected_outcome,
         test_session,
-        test_candidate,
+        test_candidate: Candidate,
     ):
-        test_candidate.roles.extend(
-            [
-                Role(
-                    date_started=date(2019, 1, 1),
-                    grade=Grade.query.filter_by(value=starting_grade).first(),
-                    role_change_id=2,
-                ),
-                Role(
-                    date_started=date(2020, 6, 1),
-                    grade=Grade.query.filter_by(value=new_grade).first(),
-                    role_change_id=role_change_id,
-                ),
-            ]
+        test_candidate.new_role(
+            start_date=date(2019, 1, 1),
+            new_org_id=1,
+            new_profession_id=1,
+            new_location_id=1,
+            new_grade_id=Grade.query.filter_by(value=starting_grade).first().id,
+            new_title="Old job",
+            role_change_id=2,
         )
-        assert test_candidate.roles[0].is_promotion() is expected_outcome
+        test_candidate.new_role(
+            start_date=date(2020, 6, 1),
+            new_org_id=1,
+            new_profession_id=1,
+            new_location_id=1,
+            new_grade_id=Grade.query.filter_by(value=new_grade).first().id,
+            new_title="New job",
+            role_change_id=role_change_id,
+        )
+        assert test_candidate.current_role().is_promotion() is expected_outcome

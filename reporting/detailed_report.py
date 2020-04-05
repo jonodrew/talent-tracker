@@ -51,7 +51,7 @@ class DetailedReport(Report):
 
     def row_writer(self, candidate: Candidate) -> List:
         application = candidate.most_recent_application()
-        current_role: Role = candidate.roles[0]
+        current_role: Role = candidate.current_role()
         return [
             f"{candidate.first_name} {candidate.last_name}",
             candidate.email_address,
@@ -94,10 +94,12 @@ class DetailedReport(Report):
         return [
             candidate
             for candidate in self.eligible_candidates()
-            if self.role_change_type
+            if self.role_change_type.id
             in {
-                role.role_change
-                for role in candidate.roles_since_date(date(self.intake, 1, 1))
+                rce.role_change_id
+                for rce in candidate.role_change_events_since_date(
+                    date(self.intake, 1, 1)
+                )
             }
         ]
 

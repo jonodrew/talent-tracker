@@ -43,6 +43,18 @@ def load_user(id):
     return User.query.get(int(id))
 
 
+class RoleChangeEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    role_change_date = db.Column(db.Date())
+
+    candidate_id = db.Column(db.ForeignKey("candidate.id"))
+    former_role_id = db.Column(db.ForeignKey("role.id"))
+    new_role_id = db.Column(db.ForeignKey("role.id"))
+    role_change_id = db.Column(db.ForeignKey("promotion.id"))
+
+    role_change = db.relationship("Promotion", lazy="select")
+
+
 class Ethnicity(CandidateGetterMixin, db.Model):
     """
     The ethnicity table has a boolean flag for bame, allowing us to query candidates (and therefore data connected to
@@ -78,9 +90,7 @@ class Candidate(db.Model):
     main_job_type_id = db.Column(db.ForeignKey("main_job_type.id"))
     joining_grade_id = db.Column(db.ForeignKey("grade.id"))
 
-    roles = db.relationship(
-        "Role", backref="candidate", lazy="dynamic", order_by="Role.date_started.desc()"
-    )
+    roles = db.relationship("Role", backref="candidate", lazy="dynamic")
     applications = db.relationship(
         "Application",
         backref="candidate",
@@ -89,14 +99,17 @@ class Candidate(db.Model):
     )
     joining_grade = db.relationship("Grade", backref="candidate")
     role_changes = db.relationship(
-        "RoleChangeEvent", backref="candidate", lazy="dynamic"
+        "RoleChangeEvent",
+        backref="candidate",
+        lazy="dynamic",
+        order_by="RoleChangeEvent.role_change_date.desc()",
     )
 
     def __repr__(self):
         return f"<Candidate email {self.email_address}>"
 
     def current_grade(self) -> "Grade":
-        return self.roles.order_by(Role.date_started.desc()).first().grade
+        return self.current_role().grade
 
     def promoted_between(
         self,
@@ -144,16 +157,24 @@ class Candidate(db.Model):
         )
 
     def current_location(self):
-        return self.roles.order_by(Role.id.desc()).first().location.value
+        return self.current_role().location.value
 
-    def roles_since_date(self, since_date: datetime.date):
-        return [role for role in self.roles if role.date_started >= since_date]
+    def role_change_events_since_date(self, since_date: datetime.date):
+        return self.role_changes.filter(
+            RoleChangeEvent.role_change_date >= since_date
+        ).all()
 
     def update_email(self, new_address: str, primary: bool):
         if primary:
             self.email_address = new_address
         elif not primary:
             self.secondary_email_address = new_address
+
+    def current_role(self):
+        if self.role_changes.first() is None:
+            return None
+        else:
+            return Role.query.get(self.role_changes.first().new_role_id)
 
     def new_role(
         self,
@@ -165,22 +186,21 @@ class Candidate(db.Model):
         new_title,
         role_change_id,
     ):
-        self.roles.append(
-            Role(
-                date_started=start_date,
-                organisation_id=new_org_id,
-                profession_id=new_profession_id,
-                location_id=new_location_id,
-                grade_id=new_grade_id,
-                role_name=new_title,
-                role_change_id=role_change_id,
-            )
+        new_role = Role(
+            organisation_id=new_org_id,
+            profession_id=new_profession_id,
+            location_id=new_location_id,
+            grade_id=new_grade_id,
+            role_name=new_title,
         )
+        self.roles.append(new_role)
         self.role_changes.append(
             RoleChangeEvent(
                 candidate_id=self.id,
-                former_role_id=self.roles[1].id,
-                new_role_id=self.roles[0].id,
+                former_role_id=None
+                if self.current_role() is None
+                else self.current_role().id,
+                new_role_id=new_role.id,
                 role_change_id=role_change_id,
                 role_change_date=start_date,
             )
@@ -276,13 +296,20 @@ class Role(db.Model):
     role_change = db.relationship("Promotion", lazy="select")
 
     def __repr__(self):
-        return f"<Role held by {self.candidate} at {self.organisation_id}>"
+        return (
+            f"<Role '{self.role_name}' held by {self.candidate} at {self.organisation}>"
+        )
 
     def is_promotion(self):
-        role_before_this = (
-            self.candidate.roles.order_by(Role.date_started.desc()).limit(2).all()[1]
-        )
+        role_before_this = Role.query.get(self.candidate.role_changes[1].former_role_id)
         return self.grade.rank < role_before_this.grade.rank
+
+    def date_started(self):
+        return (
+            RoleChangeEvent.query.filter_by(new_role_id=self.id)
+            .first()
+            .role_change_date
+        )
 
 
 class Scheme(db.Model):
@@ -399,13 +426,3 @@ class AuditEvent(db.Model):
 class Promotion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.String(28), index=True)
-
-
-class RoleChangeEvent(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    role_change_date = db.Column(db.Date())
-
-    candidate_id = db.Column(db.ForeignKey("candidate.id"))
-    former_role_id = db.Column(db.ForeignKey("role.id"))
-    new_role_id = db.Column(db.ForeignKey("role.id"))
-    role_change_id = db.Column(db.ForeignKey("promotion.id"))
