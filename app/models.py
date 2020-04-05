@@ -167,6 +167,12 @@ class Candidate(db.Model):
         elif not primary:
             self.secondary_email_address = new_address
 
+    def current_role(self):
+        if self.role_changes.first() is None:
+            return None
+        else:
+            return Role.query.get(self.role_changes.first().new_role_id)
+
     def new_role(
         self,
         start_date: datetime.date,
