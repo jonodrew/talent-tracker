@@ -1,4 +1,11 @@
-from app.models import Candidate, Organisation
+from app.models import (
+    Candidate,
+    Organisation,
+    Belief,
+    Sexuality,
+    Ethnicity,
+    Gender,
+)
 import pytest
 from datetime import date
 from modules.upload import Row
@@ -70,8 +77,18 @@ class TestUpload:
         assert candidate.__getattribute__(db_field) == new_data
 
     def test_redact_mixes_up_protected_characteristics(
-        self, year, scheme, test_session, detailed_candidate, test_upload_object
+        self, year, scheme, test_session, test_upload_object, seed_data,
     ):
+        existing_answers = [
+            (Belief, "Agnostic"),
+            (Sexuality, "Bisexual"),
+            (Ethnicity, "White English/Welsh/Scottish/Northern Irish/British"),
+            (Gender, "Male"),
+        ]
+        for answer in existing_answers:
+            row_to_go = answer[0].query.filter_by(value=answer[1]).first()
+            test_session.delete(row_to_go)
+            # if these aren't taken out, there's a chance they'll be randomly chosen again
         test_session.add_all(
             [
                 Organisation(name="SIS"),
@@ -86,11 +103,14 @@ class TestUpload:
         )
         u.complete_upload()
         candidate = Candidate.query.filter_by(email_address="PU007@gov.uk").first()
-        assert candidate.sexuality.value == "Pan"
-        assert candidate.belief.value == "Don't forget to be awesome"
-        assert candidate.ethnicity.value == "Terran"
-        assert candidate.gender.value in ["Fork", "Knife", "Chopsticks"]
-        assert candidate.main_job_type.value == "Roboticist"
+        assert candidate.sexuality.value != "Bisexual"
+        assert candidate.belief.value != "Agnostic"
+        assert (
+            candidate.ethnicity.value
+            != "White English/Welsh/Scottish/Northern Irish/British"
+        )
+        assert candidate.gender.value != "Male"
+        assert candidate.main_job_type.value != "Don’t know"
 
 
 class TestRow:

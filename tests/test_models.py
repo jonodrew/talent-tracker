@@ -28,17 +28,8 @@ def test_fls_questions_create_leadership_record(test_session):
 
 class TestCandidate:
     def test_current_grade_returns_correct_grade(self, test_candidate, test_session):
-        grades = Grade.query.order_by(Grade.rank.asc()).all()
-        roles = [
-            Role(date_started=date(2017 + i, 1, 1), grade=grades[i]) for i in range(3)
-        ]
-        test_candidate.roles.extend(roles)
-        test_session.add(test_candidate)
-        test_session.commit()
-        assert (
-            Candidate.query.get(test_candidate.id).current_grade().value
-            == "Deputy Director (SCS1)"
-        )
+
+        assert Candidate.query.get(test_candidate.id).current_grade().value == "Grade 7"
 
     @pytest.mark.parametrize(
         "list_of_role_data, expected_outcome",
@@ -139,7 +130,7 @@ class TestCandidate:
     @pytest.mark.parametrize(
         "prior_application, expected_output",
         [
-            (Application(application_date=date(2018, 6, 1)), date(2019, 6, 1)),
+            (Application(application_date=date(2017, 6, 1)), date(2018, 6, 1)),
             (Application(application_date=date(2020, 6, 1)), date(2020, 6, 1)),
         ],
     )

@@ -191,16 +191,20 @@ class TestDeltaOfferPromotionReport:
 
 
 class TestDetailedPromotionReport:
-    @pytest.mark.parametrize("intake_year", (2017, 2018, 2019))
+    @pytest.mark.parametrize("intake_year", (2018, 2019, 2020))
     @pytest.mark.parametrize("role_change_type", (1, 2, 3))
     @freeze_time(date(2020, 3, 1))
     def test_get_data(
-        self, role_change_type, detailed_candidate, intake_year, test_session
+        self,
+        role_change_type,
+        test_candidate_applied_and_promoted,
+        intake_year,
+        test_session,
     ):
         report = DetailedReport(intake_year, "FLS", role_change_type)
         if (
-            intake_year == 2019 and role_change_type == 1
-        ):  # 1 is a substantive promotion
+            intake_year == 2019 and role_change_type == 2
+        ):  # 2 is a substantive promotion
             assert report.get_data()[0] == [
                 "Testy Candidate",
                 "test.candidate@numberten.gov.uk",
@@ -211,7 +215,7 @@ class TestDetailedPromotionReport:
                 "Director (SCS2)",
                 "Stargate-1",
                 "Department of Fun",
-                date(2018, 9, 1),
+                date(2017, 9, 1),
                 "Admin Assistant (AA)",
                 True,
                 "Terran",
