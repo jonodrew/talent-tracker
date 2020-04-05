@@ -129,27 +129,75 @@ def test_candidate(test_session):
 
 
 @pytest.fixture
-def test_candidate_applied_to_fls(test_candidate, test_session):
-    test_candidate.applications.append(
+def detailed_candidate(test_candidate: Candidate, test_session):
+    test_candidate: Candidate
+    test_session.add(Organisation(id=1, name="Department of Fun"))
+    test_session.add(Location(id=2, value="Stargate-1"))
+    test_session.add(WorkingPattern(id=1, value="24/7"))
+    test_session.add(Belief(id=1, value="Don't forget to be awesome"))
+    test_session.add(Sexuality(id=1, value="Pan"))
+    test_session.add(Ethnicity(id=1, value="Terran", bame=True))
+    test_session.add_all(
+        [
+            Gender(id=1, value="Fork"),
+            Gender(id=2, value="Knife"),
+            Gender(id=3, value="Chopsticks"),
+        ]
+    )
+    test_session.add(Grade(id=5, value="Director (SCS2)", rank=3))
+    test_session.add(
+        MainJobType(id=1, value="Roboticist", lower_socio_economic_background=True)
+    )
+    test_session.add(AgeRange(id=1, value="Immortal"))
+
+    test_candidate.joining_date = date(2017, 9, 1)
+    test_candidate.joining_grade_id = 1
+    test_candidate.main_job_type_id = 1
+    test_candidate.working_pattern_id = 1
+    test_candidate.belief_id = 1
+    test_candidate.age_range_id = 1
+    test_candidate.caring_responsibility = True
+    test_candidate.long_term_health_condition = True
+
+    test_session.add(test_candidate)
+    test_session.commit()
+
+    yield Candidate.query.get(1)
+
+
+@pytest.fixture
+def test_candidate_applied_to_fls(detailed_candidate, test_session):
+    detailed_candidate.applications.append(
         Application(
-            application_date=date(2019, 6, 1),
+            application_date=date(2018, 6, 1),
             scheme_id=1,
-            scheme_start_date=date(2020, 3, 1),
+            scheme_start_date=date(2019, 3, 1),
+            cohort=1,
+            meta=True,
+            delta=False,
         )
     )
-    test_session.add(test_candidate)
+    test_session.add(detailed_candidate)
     test_session.commit()
     yield Candidate.query.first()
 
 
 @pytest.fixture
-def test_candidate_applied_and_promoted(test_candidate_applied_to_fls, test_session):
-    test_candidate_applied_to_fls.roles.append(
-        Role(date_started=date(2020, 1, 1), role_change_id=2)
+def test_candidate_applied_and_promoted(
+    test_candidate_applied_to_fls: Candidate, test_session
+):
+    test_candidate_applied_to_fls.new_role(
+        start_date=date(2019, 6, 1),
+        new_org_id=1,
+        new_profession_id=1,
+        new_location_id=2,
+        new_grade_id=5,
+        new_title="Director of Happiness",
+        role_change_id=2,
     )
     test_session.add(test_candidate_applied_to_fls)
     test_session.commit()
-    yield
+    yield Candidate.query.first()
 
 
 @pytest.fixture
@@ -287,58 +335,6 @@ def scheme_appender(test_session):
             )
 
     return _add_scheme
-
-
-@pytest.fixture
-def detailed_candidate(test_candidate: Candidate, test_session):
-    test_candidate: Candidate
-    test_session.add(Organisation(id=1, name="Department of Fun"))
-    test_session.add(Location(id=2, value="Stargate-1"))
-    test_session.add(WorkingPattern(id=1, value="24/7"))
-    test_session.add(Belief(id=1, value="Don't forget to be awesome"))
-    test_session.add(Sexuality(id=1, value="Pan"))
-    test_session.add(Ethnicity(id=1, value="Terran", bame=True))
-    test_session.add_all(
-        [
-            Gender(id=1, value="Fork"),
-            Gender(id=2, value="Knife"),
-            Gender(id=3, value="Chopsticks"),
-        ]
-    )
-    test_session.add(Grade(id=5, value="Director (SCS2)", rank=3))
-    test_session.add(
-        MainJobType(id=1, value="Roboticist", lower_socio_economic_background=True)
-    )
-    test_session.add(AgeRange(id=1, value="Immortal"))
-
-    test_candidate.joining_date = date(2018, 9, 1)
-    test_candidate.joining_grade_id = 1
-    test_candidate.main_job_type_id = 1
-    test_candidate.working_pattern_id = 1
-    test_candidate.belief_id = 1
-    test_candidate.age_range_id = 1
-    test_candidate.caring_responsibility = True
-    test_candidate.long_term_health_condition = True
-
-    test_candidate.applications.append(
-        Application(
-            application_date=date(2018, 6, 1),
-            scheme_start_date=date(2019, 3, 1),
-            meta=True,
-            delta=False,
-            cohort=1,
-            scheme_id=1,
-        )
-    )
-    test_candidate.new_role(
-        start_date=date(2019, 6, 1),
-        new_org_id=1,
-        new_profession_id=1,
-        new_location_id=2,
-        new_grade_id=5,
-        new_title="Director of Happiness",
-        role_change_id=1,
-    )
 
 
 @pytest.fixture
