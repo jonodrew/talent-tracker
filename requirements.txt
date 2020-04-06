@@ -6,7 +6,7 @@ attrs==19.1.0
 behave==1.2.6
 black==19.3b0
 certifi==2019.9.11
-cfgv==2.0.1
+cfgv==3.1.0
 chardet==3.0.4
 Click==7.0
 entrypoints==0.3
