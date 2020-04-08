@@ -39,7 +39,7 @@ packaging==19.2
 pandas==1.0.3
 parse==1.15.0
 parse-type==0.5.2
-pbr==5.4.4
+pbr==5.4.5
 pluggy==0.13.1
 pre-commit==2.2.0
 psycopg2==2.8.3
