@@ -8,7 +8,7 @@ black==19.3b0
 certifi==2019.9.11
 cfgv==3.1.0
 chardet==3.0.4
-Click==7.0
+Click==7.1.1
 entrypoints==0.3
 extras==1.0.0
 fixtures==3.0.0
