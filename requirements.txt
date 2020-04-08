@@ -15,7 +15,7 @@ fixtures==3.0.0
 flake8==3.7.8
 Flask==1.1.1
 Flask-Login==0.4.1
-Flask-Migrate==2.5.2
+Flask-Migrate==2.5.3
 Flask-SQLAlchemy==2.4.0
 freezegun==0.3.12
 fuzzywuzzy==0.17.0
