@@ -96,8 +96,8 @@ class TestRoleUpdate:
     def test_get(self, test_client, test_candidate, logged_in_user, test_roles):
         with test_client.session_transaction() as sess:
             sess["candidate-id"] = 1
-        result = test_client.get(f"/update/role", follow_redirects=False)
-        assert f'<h1 class="govuk-heading-xl">Role update</h1>' in result.data.decode(
+        result = test_client.get("/update/role", follow_redirects=False)
+        assert '<h1 class="govuk-heading-xl">Role update</h1>' in result.data.decode(
             "UTF-8"
         )
 
