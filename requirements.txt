@@ -64,7 +64,7 @@ toml==0.10.0
 traceback2==1.4.0
 unittest2==1.1.0
 urllib3==1.25.8
-virtualenv==20.0.16
+virtualenv==20.0.17
 wcwidth==0.1.9
 Werkzeug==1.0.1
 xlrd==1.2.0
