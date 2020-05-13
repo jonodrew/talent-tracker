@@ -1,6 +1,7 @@
 FROM python:3.7.3
 COPY ./app /code/app
-COPY ./node_modules/govuk-frontend/assets /code/assets
+COPY ./node_modules/govuk-frontend/assets /code/app/assets
+COPY ./node_modules/govuk-frontend/all.js /code/app/static/js/govuk.js
 COPY requirements.txt /code/
 COPY run.py /code/
 COPY migrations /code/migrations
