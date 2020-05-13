@@ -6,7 +6,11 @@ def create_app(configuration=Config):
     app = Flask(__name__)
 
     from app.models import db, login_manager, migrate
+    from sassutils.wsgi import SassMiddleware
 
+    app.wsgi_app = SassMiddleware(
+        app.wsgi_app, {"app": ("static/sass", "static/css", "/static/css")}
+    )
     app.config.from_object(configuration)
     db.init_app(app)
     migrate.init_app(app, db)
