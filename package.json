@@ -1,7 +1,7 @@
 {
   "name": "talent-tracker",
   "version": "1.0.0",
-  "description": "",
+  "description": "[![Build Status](https://travis-ci.org/jonodrew/talent-tracker.svg?branch=master)](https://travis-ci.org/jonodrew/talent-tracker)",
   "main": "index.js",
   "directories": {
     "test": "tests"
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/jonodrew/talent-tracker#readme",
   "dependencies": {
-    "govuk-frontend": "^2.11.0"
-  }
+    "govuk-frontend": "^2.13.0"
+  },
+  "devDependencies": {}
 }
