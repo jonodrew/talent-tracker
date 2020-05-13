@@ -11,6 +11,7 @@ chardet==3.0.4
 Click==7.1.2
 entrypoints==0.3
 extras==1.0.0
+filelock==3.0.12
 fixtures==3.0.0
 flake8==3.8.1
 Flask==1.1.2
@@ -19,6 +20,7 @@ Flask-Migrate==2.5.3
 Flask-SQLAlchemy==2.4.1
 freezegun==0.3.15
 fuzzywuzzy==0.18.0
+glob2==0.7
 gunicorn==20.0.4
 identify==1.4.15
 idna==2.9
@@ -27,6 +29,7 @@ importlib-resources==1.5.0
 itsdangerous==1.1.0
 Jinja2==2.11.2
 lettuce==0.2.23
+libsass==0.20.0
 linecache2==1.0.0
 Mako==1.1.2
 MarkupSafe==1.1.1
@@ -39,6 +42,7 @@ packaging==20.3
 pandas==1.0.3
 parse==1.15.0
 parse-type==0.5.2
+pathspec==0.8.0
 pbr==5.4.5
 pluggy==0.13.1
 pre-commit==2.4.0
@@ -48,12 +52,14 @@ pycodestyle==2.6.0
 pyflakes==2.2.0
 pyparsing==2.4.7
 pytest==5.4.2
+pytest-bdd==3.2.1
 python-dateutil==2.8.1
 python-editor==1.0.4
 python-mimeparse==1.6.0
 python-subunit==1.4.0
 pytz==2020.1
 PyYAML==5.3.1
+regex==2020.4.4
 requests==2.23.0
 selenium==3.141.0
 six==1.14.0
@@ -62,6 +68,7 @@ sure==1.4.11
 testtools==2.4.0
 toml==0.10.0
 traceback2==1.4.0
+typed-ast==1.4.1
 unittest2==1.1.0
 urllib3==1.25.9
 virtualenv==20.0.20
