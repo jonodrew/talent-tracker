@@ -40,7 +40,7 @@ nodeenv==1.4.0
 numpy==1.19.1
 packaging==20.4
 pandas==1.0.5
-parse==1.15.0
+parse==1.16.0
 parse-type==0.5.2
 pathspec==0.8.0
 pbr==5.4.5
