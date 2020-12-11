@@ -7,7 +7,7 @@ behave==1.2.6
 black==20.8b1
 certifi==2020.12.5
 cfgv==3.2.0
-chardet==3.0.4
+chardet==4.0.0
 Click==7.1.2
 entrypoints==0.3
 extras==1.0.0
