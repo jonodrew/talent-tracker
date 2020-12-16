@@ -51,7 +51,7 @@ py==1.10.0
 pycodestyle==2.6.0
 pyflakes==2.2.0
 pyparsing==2.4.7
-pytest==6.2.0
+pytest==6.2.1
 pytest-bdd==4.0.2
 python-dateutil==2.8.1
 python-editor==1.0.4
