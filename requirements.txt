@@ -68,7 +68,7 @@ sure==1.4.11
 testtools==2.4.0
 toml==0.10.2
 traceback2==1.4.0
-typed-ast==1.4.1
+typed-ast==1.4.2
 unittest2==1.1.0
 urllib3==1.26.2
 virtualenv==20.2.2
