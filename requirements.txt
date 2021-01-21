@@ -58,7 +58,7 @@ python-editor==1.0.4
 python-mimeparse==1.6.0
 python-subunit==1.4.0
 pytz==2020.5
-PyYAML==5.4
+PyYAML==5.4.1
 regex==2020.11.13
 requests==2.25.1
 selenium==3.141.0
